@@ -56,7 +56,7 @@ create function color_of(spot) returns color as 'select $1.c;' language sql;
 --
 -- TODO: Get real / interesting image data in here!
 insert into face values (1, '( (-Infinity,-Infinity),(-Infinity,Infinity), (Infinity,Infinity), (Infinity,-Infinity) )',(0.0,0.0,0.0,1.0),10000,0.0,0.0);
-insert into face values (2, '( ( 0.0 ,0.0 ),( 0.0,10.0 ), ( 10.0,10.0 ) )',(0.5,0.5,0.0,1.0),0.0,1.0,0.5);
+insert into face values (2, '( ( 0.0 ,0.0 ),( 0.0,100.0 ), ( 100.0,100.0 ) )',(0.5,0.5,0.0,1.0),0.0,1.0,0.5);
 
 
 --
@@ -85,37 +85,26 @@ create aggregate color_from  (
 --
 -- Walk through all the pixels we need, accumulating the rgba values
 --
-/* Old version, 'cause I'm sentamental--or at least mental
-select 
-    p.x as x, 
-    p.y as y, 
-    color_from(the_spot(depth_of_intersection(point(p.x,p.y),f),f.c,the_vector(0.0,0.0,1.0))) as c 
-  from 
-    (select generate_series(1,5) as y,generate_series(1,7) as x) p left join 
-  face f on f.perimeter ~ point(p.x,p.y)
-  group by p.x,p.y
-  order by p.x,p.y
-  ;
-*/
 
 -- TODO: Wrap this in an agregator that makes it into a blob w. the image data
 -- TODO: Un-embedd the height and width
 -- TODO: Put normal on the face and propogate it
 
-select 
+select
     color_from(the_spot(z,c,the_vector(0.0,0.0,1.0))) as pixel 
   from 
 (select 
-    p.x as x, 
-    p.y as y, 
-    depth_of_intersection(point(p.x,p.y),f) as z,
+    x.x as x, 
+    y.y as y, 
+    depth_of_intersection(point(x.x,y.y),f) as z,
     f.c as c
   from 
-    (select generate_series(1,5) as y,generate_series(1,7) as x) p left join 
-  face f on f.perimeter ~ point(p.x,p.y)
+    (select generate_series(1,50) as y) y cross join (select generate_series(1,70) as x) x left join 
+  face f on f.perimeter ~ point(x.x,y.y)
   order by y desc,x,z desc
 ) v
   group by y,x
+  order by y,x
   ;
 
 
