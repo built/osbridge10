@@ -1,0 +1,172 @@
+a
+
+This block of code sums arbitrary pairs of integers found in the buffer in the
+form:
+
+126+9997=
+
+and replaces such lines with the indicated sum.  It does this by recursively 
+solving for the last digit, with : used to indicate a carry.  Thus 1+2= becomes
+3, 9+5= becomes :4 and then 14
+
+23+12= 
+
+becomes the odd looking intermedeate 
+
+2+1=5 
+
+(with the once place solved and the tens place left to do) and then 
+
+35
+
+The problem above would be transformed on successive recursions into:
+
+126+9997=
+12+999=:3
+1+99=:23
+9:123
+10123
+
+Internally, this is accomplished by converting each of the final digits onto
+the corresponding number of "x"s (bracketed with "%"s for convenience) and then
+counting the "x"s.
+.
+u
+a
+s/=/=%/
+g/\([0-9]*\)9+\([0-9]*\)=/s//\18+\2=x/
+g/\([0-9]*\)+\([0-9]*\)9=/s//\1+\28=x/
+g/\([0-9]*\)8+\([0-9]*\)=/s//\17+\2=x/
+g/\([0-9]*\)+\([0-9]*\)8=/s//\1+\27=x/
+g/\([0-9]*\)7+\([0-9]*\)=/s//\16+\2=x/
+g/\([0-9]*\)+\([0-9]*\)7=/s//\1+\26=x/
+g/\([0-9]*\)6+\([0-9]*\)=/s//\15+\2=x/
+g/\([0-9]*\)+\([0-9]*\)6=/s//\1+\25=x/
+g/\([0-9]*\)5+\([0-9]*\)=/s//\14+\2=x/
+g/\([0-9]*\)+\([0-9]*\)5=/s//\1+\24=x/
+g/\([0-9]*\)4+\([0-9]*\)=/s//\13+\2=x/
+g/\([0-9]*\)+\([0-9]*\)4=/s//\1+\23=x/
+g/\([0-9]*\)3+\([0-9]*\)=/s//\12+\2=x/
+g/\([0-9]*\)+\([0-9]*\)3=/s//\1+\22=x/
+g/\([0-9]*\)2+\([0-9]*\)=/s//\11+\2=x/
+g/\([0-9]*\)+\([0-9]*\)2=/s//\1+\21=x/
+g/\([0-9]*\)1+\([0-9]*\)=/s//\10+\2=x/
+g/\([0-9]*\)+\([0-9]*\)1=/s//\1+\20=x/
+g/\([0-9]*\)0+\([0-9]*\)0=/s//\1+\2=%/
+g/=%xxxxxxxxxx/s//=:%/
+g/%xxxxxxxxx%/s//9/
+g/%xxxxxxxx%/s//8/
+g/%xxxxxxx%/s//7/
+g/%xxxxxx%/s//6/
+g/%xxxxx%/s//5/
+g/%xxxx%/s//4/
+g/%xxx%/s//3/
+g/%xx%/s//2/
+g/%x%/s//1/
+g/%%/s//0/
+g/\([0-9][0-9]*\)+=/s//\1/
+g/^+\([0-9][0-9]*\)=/s//\1/
+g/^+=/s///
+g/9:/s//:0/
+g/8:/s//9/
+g/7:/s//8/
+g/6:/s//7/
+g/5:/s//6/
+g/4:/s//5/
+g/3:/s//4/
+g/2:/s//3/
+g/1:/s//2/
+g/0:/s//1/
+g/^:/s//1/
+w
+g/[=:]/!ed % < sum.ed
+q
+.
+w sum.ed
+1,$d
+a
+Given a starting sequence of fibinaci numbers, we can extend it by removing
+all but the last two, converting them into a sum as above, and then calling
+the sum routine.
+
+The only really tricky thing here is that we must write our nested end-of-
+insertion-block dots as end-. and then find and replace that pattern with a
+single dot.
+.
+u
+a
+e fibs.array-of-int
+1,--d
+1a
++
+end-.
+$a
+=
+end-.
+1,$j
+w x.int
+!ed x.int < sum.ed
+e fibs.array-of-int
+r x.int
+w fibs.array-of-int
+q
+.
+g/end-./s//./
+w next-fib.ed
+1,$d
+a
+Now we need to start our list of known fibs in the usual way, with 1, 1, 2.
+.
+u
+a
+1
+1
+2
+.
+w fibs.array-of-int
+1,$d
+a
+
+And it's showtime folks!
+.
+u
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+!ed < next-fib.ed
+
