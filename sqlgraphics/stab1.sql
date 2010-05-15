@@ -20,10 +20,10 @@ pathetically underpowered and unreliable that the difference is hardly noticable
 -- Make a clean start
 --
 
-drop table if exists face   cascade;
 drop type  if exists color  cascade;
-drop type  if exists spot   cascade;
 drop type  if exists vector cascade;
+drop table if exists face   cascade;
+drop type  if exists spot   cascade;
 
 --
 -- Define our types, tables, and helper functions
@@ -32,10 +32,6 @@ drop type  if exists vector cascade;
 -- COLOR:
 create type color as (r real, g real, b real, a real);
 create function the_color(real,real,real) returns color as 'select $1,$2,$3,$1-$1;' language sql;
-
--- FACE: A colored polygon at a given distance & tilted at a specified angle (all projected into view space)
-create table face (id integer not null, perimeter polygon, c color, z0 real, zx real, zy real, primary key (id));
--- TODO: replace zx & zy with a true normal
 
 -- VECTOR:
 create type vector as (x real, y real, z real);
@@ -46,6 +42,9 @@ create function dot(vector,vector) returns real as $$
     select $1.x*$2.x + $1.y*$2.y + $1.z*$2.z;
     $$ language sql;
 
+-- FACE: A colored polygon at a given distance & tilted at a specified angle (all projected into view space)
+create table face (id integer not null, perimeter polygon, c color, z0 real, normal vector, primary key (id));
+
 -- SPOT: A pixel's worth of color at a specified distance from and angle to the viewer
 create type spot as (z real, c color, normal vector);
 create function the_spot(real,color,vector) returns spot as 'select $1,$2,$3;' language sql;
@@ -55,15 +54,14 @@ create function color_of(spot) returns color as 'select $1.c;' language sql;
 -- Set up the image to render; normally this would come from outside
 --
 -- TODO: Get real / interesting image data in here!
-insert into face values (1, '( (-Infinity,-Infinity),(-Infinity,Infinity), (Infinity,Infinity), (Infinity,-Infinity) )',(0.0,0.0,0.0,1.0),10000,0.0,0.0);
-insert into face values (2, '( ( 0.0 ,0.0 ),( 0.0,100.0 ), ( 100.0,100.0 ) )',(0.5,0.5,0.0,1.0),0.0,1.0,0.5);
-
+insert into face values (1, '( (-Infinity,-Infinity),(-Infinity,Infinity), (Infinity,Infinity), (Infinity,-Infinity) )',(0.0,0.0,0.0,1.0),10000,(0.0,0.0,1.0));
+insert into face values (2, '( ( 0.0 ,0.0 ),( 0.0,100.0 ), ( 100.0,100.0 ) )',(0.5,0.5,0.0,1.0),0.0,(0.0,0.0,1.0));
 
 --
 -- How far back from the viewer is the spot where the pixel-ray intersects the polygon
 --
 create function depth_of_intersection(point,face) returns real as $$
-    select cast($2.z0 + $2.zx*$1[0] + $2.zy*$1[1] as real);
+    select cast($2.z0 + $2.normal.x*$1[0] + $2.normal.y*$1[1] as real);
     $$ language sql;
 
 --
@@ -88,16 +86,16 @@ create aggregate color_from  (
 
 -- TODO: Wrap this in an agregator that makes it into a blob w. the image data
 -- TODO: Un-embedd the height and width
--- TODO: Put normal on the face and propogate it
 
 select
-    color_from(the_spot(z,c,the_vector(0.0,0.0,1.0))) as pixel 
+    color_from(the_spot(z,c,n)) as pixel 
   from 
 (select 
     x.x as x, 
     y.y as y, 
     depth_of_intersection(point(x.x,y.y),f) as z,
-    f.c as c
+    f.c as c,
+    f.normal as n
   from 
     (select generate_series(1,50) as y) y cross join (select generate_series(1,70) as x) x left join 
   face f on f.perimeter ~ point(x.x,y.y)
