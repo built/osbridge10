@@ -43,7 +43,7 @@ create function dot(vector,vector) returns real as $$
     $$ language sql;
 
 -- FACE: A colored polygon at a given distance & tilted at a specified angle (all projected into view space)
-create table face (id integer not null, perimeter polygon, c color, z0 real, normal vector, primary key (id));
+create table face (perimeter polygon, c color, z0 real, normal vector);
 
 -- SPOT: A pixel's worth of color at a specified distance from and angle to the viewer
 create type spot as (z real, c color, normal vector);
@@ -54,8 +54,29 @@ create function color_of(spot) returns color as 'select $1.c;' language sql;
 -- Set up the image to render; normally this would come from outside
 --
 -- TODO: Get real / interesting image data in here!
-insert into face values (1, '( (-Infinity,-Infinity),(-Infinity,Infinity), (Infinity,Infinity), (Infinity,-Infinity) )',(0.0,0.0,0.0,1.0),10000,(0.0,0.0,1.0));
-insert into face values (2, '( ( 0.0 ,0.0 ),( 0.0,100.0 ), ( 100.0,100.0 ) )',(0.5,0.5,0.0,1.0),0.0,(0.0,0.0,1.0));
+insert into face values ( '( (-Infinity,-Infinity),(-Infinity,Infinity), (Infinity,Infinity), (Infinity,-Infinity) )',(0.0,0.0,0.0,1.0),10000,(0.0,0.0,1.0));
+-- insert into face values ( '( ( 0.0 ,0.0 ),( 0.0,100.0 ), ( 100.0,100.0 ) )',(0.5,0.5,0.0,1.0),0.0,(0.0,0.0,1.0));
+insert into face
+    select
+        polygon(array_to_string(ARRAY[
+            2*s*i+s,2*s*j+s,
+            2*s*i+s,2*s*j-s,
+            2*s*i-s,2*s*j-s,
+            2*s*i-s,2*s*j+s],',')),
+        case when (i % 2) = (j % 2) then
+            the_color(0.8,0.8,0.8)
+          else
+            the_color(0.2,0.2,0.2)
+          end,
+        0.0,
+        the_vector(0.0,0.0,1.0)
+      from
+        (select 3.5 as s) const 
+      cross join
+        (select generate_series(-50,50) as i) i 
+      cross join
+        (select generate_series(-50,50) as j) j; 
+-- TODO: translate the above into image space!
 
 --
 -- How far back from the viewer is the spot where the pixel-ray intersects the polygon
@@ -85,6 +106,7 @@ create aggregate color_from  (
 --
 
 -- TODO: Wrap this in an agregator that makes it into a blob w. the image data
+--       The priority of this has dropped considerably with the ppm / ruby wrapper
 -- TODO: Un-embedd the height and width
 
 select
