@@ -54,16 +54,27 @@ create function color_of(spot) returns color as 'select $1.c;' language sql;
 -- Set up the image to render; normally this would come from outside
 --
 -- TODO: Get real / interesting image data in here!
-insert into face values ( '( (-Infinity,-Infinity),(-Infinity,Infinity), (Infinity,Infinity), (Infinity,-Infinity) )',(0.0,0.0,0.0,1.0),10000,(0.0,0.0,1.0));
--- insert into face values ( '( ( 0.0 ,0.0 ),( 0.0,100.0 ), ( 100.0,100.0 ) )',(0.5,0.5,0.0,1.0),0.0,(0.0,0.0,1.0));
+-- TODO: This way of projecting sucks
+-- TODO: Figure out how to have globals / constants for height / width, etc.
+
+drop function if exists image_xy(real,real,real);
+create function image_xy(real,real,real) returns text as $$
+    select 
+        to_char((100+$1*220/(220+$2)),'999999.99') 
+        --      100=w/2; 220 arbitrary scaling of perspecive
+        || ',' || 
+        to_char(150+50-(($2*160-$3*60)/(220+$2)),'999999.99'); 
+        --   150=h; 50 = offset to hide ugly bottom; 160+60=220 perspective scaling & tilt
+    $$ language sql;
+
 insert into face
     select
         polygon(array_to_string(ARRAY[
-            2*s*i+s,2*s*j+s,
-            2*s*i+s,2*s*j-s,
-            2*s*i-s,2*s*j-s,
-            2*s*i-s,2*s*j+s],',')),
-        case when (i % 2) = (j % 2) then
+            image_xy(2*s*i+s,2*s*j+s,z),
+            image_xy(2*s*i+s,2*s*j-s,z),
+            image_xy(2*s*i-s,2*s*j-s,z),
+            image_xy(2*s*i-s,2*s*j+s,z)],',')),
+        case when ((i+1000) % 2) = ((j+1000) % 2) then
             the_color(0.8,0.8,0.8)
           else
             the_color(0.2,0.2,0.2)
@@ -71,13 +82,19 @@ insert into face
         0.0,
         the_vector(0.0,0.0,1.0)
       from
-        (select 3.5 as s) const 
+        (select 25 as s, -10 as z) const 
       cross join
-        (select generate_series(-50,50) as i) i 
+        (select generate_series(-15,15) as i) i 
       cross join
-        (select generate_series(-50,50) as j) j; 
--- TODO: translate the above into image space!
+        (select generate_series(1,20) as j) j; 
+--
+-- Translate the above into image space!
+--
 
+-- 
+-- Finally, put a lot of blue sky out there in the background
+--
+insert into face values ( '( (-Infinity,-Infinity),(-Infinity,Infinity), (Infinity,Infinity), (Infinity,-Infinity) )',(0.6,0.5,1.0,1.0),10000,(0.0,0.0,1.0));
 --
 -- How far back from the viewer is the spot where the pixel-ray intersects the polygon
 --
@@ -119,7 +136,7 @@ select
     f.c as c,
     f.normal as n
   from 
-    (select generate_series(1,50) as y) y cross join (select generate_series(1,70) as x) x left join 
+    (select generate_series(1,150) as y) y cross join (select generate_series(1,200) as x) x left join 
   face f on f.perimeter ~ point(x.x,y.y)
   order by y desc,x,z desc
 ) v

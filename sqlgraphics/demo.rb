@@ -1,8 +1,8 @@
-h = 70
-w = 50
+h = 150
+w = 200
 File.open('demo.ppm','w') { |f|
     f.puts "P3"
-    f.puts "#{h} #{w}"
+    f.puts "#{w} #{h}"
     f.puts "255"
     i = 0
     `/sw/bin/psql < stab1.sql`.grep(/\((.+),(.+),(.+),(.+)\)/) {
