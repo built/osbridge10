@@ -10,13 +10,13 @@ typedef struct {
     double           phase;
     double           frequency;
     double           phase_increment;
-    double           amplitude;
-      /* TODO: Should have left & right amplitudes */
+    double           left_amplitude,right_amplitude;
     volatile double  amplitude_in;
   } wave_form;
 
 #define LEFT 0
 #define RIGHT 1
+#define A_hard_coded_2_because_we_lost_our_struct 2
 
 static int my_callback(
     const void*                     inputBuffer,
@@ -33,34 +33,27 @@ static int my_callback(
 
     wave_form* freqs = (wave_form*)userData;
 
-    freqs[LEFT].phase_increment  = 0.01;
-    freqs[RIGHT].phase_increment = 0.06;
-
-       /*
-       TODO: These should be a constant times the data->xxx.frequency
-       TODO: The constant should be in the user data, and represent
-         2*Pi/Samples_per_second or something like that
-       */
-
     /* Read input buffer, process data, and fill output buffer. */
-    for(unsigned int i=0; i<framesPerBuffer; i++ ) {
+    for(unsigned int frame=0; frame<framesPerBuffer; frame++ ) {
         data_in  = *in++;
 
         /*
-        TODO: this should be a loop over the wave forms
-        TODO: instead of appending directly to the channels, this should accumulate a value for each
-          and then append them to out.
         TODO: It should compute the cross sections of the data_in with each wave (sin & cos) and then
           update their amplitude_in value after the loop (e.g., in a final loop).  This may require
           temporary storage somewhere?
         */
-        freqs[LEFT].phase += freqs[LEFT].phase_increment;
-        if( freqs[LEFT].phase > Pi ) freqs[LEFT].phase -= 2*Pi;
-        *out++ = (float) sin( freqs[LEFT].phase ) * freqs[LEFT].amplitude;
 
-        freqs[RIGHT].phase += freqs[RIGHT].phase_increment;
-        if( freqs[RIGHT].phase > Pi ) freqs[RIGHT].phase -= 2*Pi;
-        *out++ = (float) sin( freqs[RIGHT].phase ) * freqs[RIGHT].amplitude;
+        float  left_total  = 0.0;
+        float  right_total = 0.0;
+        for(unsigned int i=0; i < A_hard_coded_2_because_we_lost_our_struct; i++) {
+            freqs[i].phase += freqs[i].phase_increment;
+            if( freqs[i].phase > Pi ) freqs[i].phase -= 2*Pi;
+            amp = (float) sin( freqs[i].phase );
+            left_total  += amp*freqs[i].left_amplitude;
+            right_total += amp*freqs[i].right_amplitude;
+        }
+        *out++ = left_total;
+        *out++ = right_total;
     }
 
     return paContinue;
@@ -80,6 +73,15 @@ int main(void)
     frequencies[RIGHT].amplitude = 1.0;
     frequencies[LEFT].phase      = 0.0;
     frequencies[RIGHT].phase     = 0.0;
+    frequencies[LEFT].phase_increment  = 0.01;
+    frequencies[RIGHT].phase_increment = 0.06;
+
+       /*
+       TODO: phase_increment should be a constant times the data->xxx.frequency
+       TODO: The constant should be in the user data, and represent
+         2*Pi/Samples_per_second or something like that
+       */
+
 
     PaStream *stream;
 
