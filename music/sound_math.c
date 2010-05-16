@@ -4,7 +4,7 @@
 
 
 #define Pi        (3.14159265)
-#define Max_tones (10)
+#define MAX_TONES (10)
 
 typedef struct {
     double           phase;
@@ -14,9 +14,10 @@ typedef struct {
     volatile double  amplitude_in;
   } wave_form;
 
-#define LEFT 0
-#define RIGHT 1
-#define A_hard_coded_2_because_we_lost_our_struct 2
+typedef struct {
+    wave_form tones[MAX_TONES];
+    int length;
+} tone_table;
 
 static int my_callback(
     const void*                     inputBuffer,
@@ -31,7 +32,7 @@ static int my_callback(
     float*       out = (float *)       outputBuffer;
     float        data_in;
 
-    wave_form* freqs = (wave_form*)userData;
+    tone_table* table = (tone_table*)userData;
 
     /* Read input buffer, process data, and fill output buffer. */
     for(unsigned int frame=0; frame<framesPerBuffer; frame++ ) {
@@ -45,12 +46,13 @@ static int my_callback(
 
         float  left_total  = 0.0;
         float  right_total = 0.0;
-        for(unsigned int i=0; i < A_hard_coded_2_because_we_lost_our_struct; i++) {
-            freqs[i].phase += freqs[i].phase_increment;
-            if( freqs[i].phase > Pi ) freqs[i].phase -= 2*Pi;
-            amp = (float) sin( freqs[i].phase );
-            left_total  += amp*freqs[i].left_amplitude;
-            right_total += amp*freqs[i].right_amplitude;
+        float  amp = 0.0;
+        for(unsigned int i=0; i < table->length; i++) {
+            table->tones[i].phase += table->tones[i].phase_increment;
+            if( table->tones[i].phase > Pi ) table->tones[i].phase -= 2*Pi;
+            amp = (float) sin( table->tones[i].phase );
+            left_total  += amp*table->tones[i].left_amplitude;
+            right_total += amp*table->tones[i].right_amplitude;
         }
         *out++ = left_total;
         *out++ = right_total;
@@ -67,14 +69,18 @@ int main(void)
     int const               Frames_per_buffer = 64;
     float const             Sample_rate = 44100.0;
 
-    wave_form frequencies[2];
+    tone_table table;
 
-    frequencies[LEFT].amplitude  = 1.0;
-    frequencies[RIGHT].amplitude = 1.0;
-    frequencies[LEFT].phase      = 0.0;
-    frequencies[RIGHT].phase     = 0.0;
-    frequencies[LEFT].phase_increment  = 0.01;
-    frequencies[RIGHT].phase_increment = 0.06;
+    table.tones[0].left_amplitude  = 1.0;
+    table.tones[1].right_amplitude = 1.0;
+    table.tones[0].left_amplitude  = 1.0;
+    table.tones[1].right_amplitude = 1.0;
+    table.tones[0].phase      = 0.0;
+    table.tones[1].phase     = 0.0;
+    table.tones[0].phase_increment  = 0.01;
+    table.tones[1].phase_increment = 0.06;
+
+    table.length = 2; // It's a start.
 
        /*
        TODO: phase_increment should be a constant times the data->xxx.frequency
@@ -82,14 +88,13 @@ int main(void)
          2*Pi/Samples_per_second or something like that
        */
 
-
     PaStream *stream;
 
     Pa_Initialize();
 
     Pa_OpenDefaultStream(
         &stream, Mono/*in*/, Stereo/*out*/, paFloat32, Sample_rate, Frames_per_buffer,
-        my_callback, &frequencies
+        my_callback, &table
         );
     Pa_StartStream( stream );
     Pa_Sleep( 10*Seconds );
