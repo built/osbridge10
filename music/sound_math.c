@@ -84,8 +84,10 @@ void add_tone(tone_table* table,float l_amp,float r_amp,float freq) {
     table->length += 1;
     table->tones[i].left_amplitude  = l_amp;
     table->tones[i].right_amplitude = r_amp;
+    table->tones[i].amplitude_in    = 0.0;
+    table->tones[i].frequency       = freq;
     table->tones[i].phase           = 0.0;
-    table->tones[i].phase_increment = freq; 
+    table->tones[i].phase_increment = freq;
        /* 
        TODO: This is WRONG; the only reason it works is I'm passing the wrong values in as well 
        TODO: phase_increment should be a constant times the data->xxx.frequency
@@ -105,8 +107,10 @@ int main(void)
 
     tone_table table;
     table.length = 0;
-    add_tone(&table,1.0,0.0,0.01);
-    add_tone(&table,0.0,1.0,0.06);
+    add_tone(&table,1.0,1.0,0.01);
+    add_tone(&table,1.0,1.0,0.06);
+    add_tone(&table,0.0,0.0,0.09);
+    add_tone(&table,0.0,0.0,0.03);
 
     PaStream *stream;
 
@@ -121,6 +125,9 @@ int main(void)
     Pa_StopStream( stream );
     Pa_CloseStream( stream );
 
+    for(int i=0;i<table.length;i++) {
+        printf("%5.3f was at %10.5f\n",table.tones[i].frequency,table.tones[i].amplitude_in*100);
+    }
 
     Pa_Terminate();
     return 0;
