@@ -5,6 +5,11 @@
 
 #define Pi        (3.14159265)
 #define MAX_TONES (10)
+#define Stereo  2
+#define Mono    1
+#define Seconds 1000
+#define Frames_per_buffer 64
+#define Sample_rate 44100.0
 
 typedef struct {
     double           phase;
@@ -16,8 +21,9 @@ typedef struct {
   } wave_form;
 
 typedef struct {
-    wave_form tones[MAX_TONES];
-    int       length;
+    int       tones;
+    wave_form tone[MAX_TONES];
+    long      samples;
 } tone_table;
 
 static int my_callback(
@@ -35,82 +41,67 @@ static int my_callback(
 
     tone_table* table = (tone_table*)userData;
 
-    for(unsigned int i=0; i < table->length; i++) {
-        table->tones[i].s_cross = 0.0;
-        table->tones[i].c_cross = 0.0;
-    }
- 
-    /* Read input buffer, process data, and fill output buffer. */
     for(unsigned int frame=0; frame<framesPerBuffer; frame++ ) {
+        table->samples += 1;
         data_in  = *in++;
-
-       /*
-        TODO: It should compute the cross sections of the data_in with each wave (sin & cos) and then
-          update their amplitude_in value after the loop (e.g., in a final loop).  This may require
-          temporary storage somewhere?
-        */
-
         float  left_total  = 0.0;
         float  right_total = 0.0;
-        for(unsigned int i=0; i < table->length; i++) {
-            table->tones[i].phase += table->tones[i].phase_increment;
-            if( table->tones[i].phase > Pi ) table->tones[i].phase -= 2*Pi;
-            float s_amp = (float) sin( table->tones[i].phase );
-            float c_amp = (float) cos( table->tones[i].phase );
-            left_total  += s_amp*table->tones[i].left_amplitude;
-            right_total += s_amp*table->tones[i].right_amplitude;
-            table->tones[i].s_cross += s_amp*data_in;
-            table->tones[i].c_cross += c_amp*data_in;
+        for(unsigned int i=0; i < table->tones; i++) {
+            table->tone[i].phase += table->tone[i].phase_increment;
+            if( table->tone[i].phase > Pi ) table->tone[i].phase -= 2*Pi;
+            float s_amp = (float) sin( table->tone[i].phase );
+            float c_amp = (float) cos( table->tone[i].phase );
+            left_total  += s_amp*table->tone[i].left_amplitude;
+            right_total += s_amp*table->tone[i].right_amplitude;
+            table->tone[i].s_cross += s_amp*data_in;
+            table->tone[i].c_cross += c_amp*data_in;
         }
         *out++ = left_total;
         *out++ = right_total;
     }
 
-    for(unsigned int i=0; i < table->length; i++) {
-        table->tones[i].amplitude_in = 
-            0.9*table->tones[i].amplitude_in +
-            0.1*(
-              table->tones[i].s_cross*table->tones[i].s_cross+
-              table->tones[i].c_cross*table->tones[i].c_cross
-            );
+    for(unsigned int i=0; i < table->tones; i++) {
+        wave_form* t = &(table->tone[i]);
+        t->amplitude_in = (t->s_cross*t->s_cross+t->c_cross*t->c_cross)/table->samples;
     }
  
     return paContinue;
 }
 
 void add_tone(tone_table* table,float l_amp,float r_amp,float freq) {
-    int i = table->length;
+    int i = table->tones;
     /* TODO: Range check! */
-    table->length += 1;
-    table->tones[i].left_amplitude  = l_amp;
-    table->tones[i].right_amplitude = r_amp;
-    table->tones[i].amplitude_in    = 0.0;
-    table->tones[i].frequency       = freq;
-    table->tones[i].phase           = 0.0;
-    table->tones[i].phase_increment = freq;
-       /* 
-       TODO: This is WRONG; the only reason it works is I'm passing the wrong values in as well 
-       TODO: phase_increment should be a constant times the data->xxx.frequency
-       TODO: The constant should be in the user data, and represent
-         2*Pi/Samples_per_second or something like that
-       */
+    table->tones += 1;
+    table->tone[i].left_amplitude  = l_amp;
+    table->tone[i].right_amplitude = r_amp;
+    table->tone[i].amplitude_in    = 0.0;
+    table->tone[i].frequency       = freq;
+    table->tone[i].phase           = 0.0;
+    table->tone[i].s_cross         = 0.0;
+    table->tone[i].c_cross         = 0.0;
+    table->tone[i].phase_increment = freq*2*Pi/Sample_rate;
 }
 
 
-#define Stereo  2
-#define Mono    1
-#define Seconds 1000
 int main(void)
 {
-    int const               Frames_per_buffer = 64;
-    float const             Sample_rate = 44100.0;
-
+    float half_step = 1.0594630943593;
+    float full_step = half_step*half_step;
+    float A_1 = 440.0;
+    float B_1 = A_1*full_step;
+    float C_2 = B_1*half_step;
+    float D_2 = C_2*full_step;
+    float E_2 = D_2*full_step;
+    float F_2 = E_2*half_step;
     tone_table table;
-    table.length = 0;
-    add_tone(&table,1.0,1.0,0.01);
-    add_tone(&table,1.0,1.0,0.06);
-    add_tone(&table,0.0,0.0,0.09);
-    add_tone(&table,0.0,0.0,0.03);
+    table.tones = 0;
+    table.samples = 0;
+    add_tone(&table,0.0,0.0,A_1);
+    add_tone(&table,0.0,0.0,B_1);
+    add_tone(&table,1.0,0.0,C_2);
+    add_tone(&table,0.0,0.0,D_2);
+    add_tone(&table,0.0,0.5,E_2);
+    add_tone(&table,0.0,0.0,F_2);
 
     PaStream *stream;
 
@@ -125,8 +116,12 @@ int main(void)
     Pa_StopStream( stream );
     Pa_CloseStream( stream );
 
-    for(int i=0;i<table.length;i++) {
-        printf("%5.3f was at %10.5f\n",table.tones[i].frequency,table.tones[i].amplitude_in*100);
+    for(int i=0;i<table.tones;i++) {
+        printf("%8.3f (%5.3f) was at %10.5f\n",
+           table.tone[i].frequency,
+           table.tone[i].phase_increment,
+           table.tone[i].amplitude_in/100.0
+           );
     }
 
     Pa_Terminate();
