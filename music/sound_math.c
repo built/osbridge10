@@ -1,7 +1,7 @@
 #include "stdio.h"
 #include "portaudio.h"
 #include <math.h>
-
+#include <unistd.h>
 
 #define Pi        (3.14159265)
 #define MAX_TONES (20)
@@ -204,18 +204,21 @@ void chord_test()
     report_what_we_heard(&table);
 }
 
+void sing(const char* s) {
+    FILE* say = popen("say -v cello","w");
+    fprintf(say,s);
+    pclose(say);
+}
 
 int main(void)
 {
-
+    sing("Ready");
     /* 
     TODO: command line switching between modes or...?
     */
-
     chord_test();
     /* calibrate(); */
     /* slide_test(); */
-
     return 0;
 }
 
