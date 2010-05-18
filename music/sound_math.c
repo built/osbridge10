@@ -67,7 +67,7 @@ static int my_callback(
 
     for(unsigned int i=0; i < table->tones; i++) {
         wave_form* t = &(table->tone[i]);
-        t->amplitude_in = (t->s_cross*t->s_cross+t->c_cross*t->c_cross)/table->samples;
+        t->amplitude_in = ( (t->s_cross*t->s_cross) + (t->c_cross*t->c_cross) ) / table->samples;
     }
 
     return paContinue;
@@ -221,17 +221,18 @@ int main(int argc, char**argv)
 
     if( strcmp(option, "chord") == 0 )
     {
+        printf("Chord test.\n");
         chord_test();
     }
     else if( strcmp(option, "calibrate") == 0 )
     {
-        printf("calibrate goes here\n");
-        /* calibrate(); */
+        printf("Calibrate.\n");
+        calibrate();
     }
     else if( strcmp(option, "slide") == 0 )
     {
-        printf("slide_test goes here\n");
-        /* slide_test(); */
+        printf("Slide test.\n");
+        slide_test();
     }
     else
     {
