@@ -2,6 +2,7 @@
 #include "portaudio.h"
 #include <math.h>
 #include <unistd.h>
+#include <string.h>
 
 #define Pi        (3.14159265)
 #define MAX_TONES (20)
@@ -68,7 +69,7 @@ static int my_callback(
         wave_form* t = &(table->tone[i]);
         t->amplitude_in = (t->s_cross*t->s_cross+t->c_cross*t->c_cross)/table->samples;
     }
- 
+
     return paContinue;
 }
 
@@ -210,15 +211,33 @@ void sing(const char* s) {
     pclose(say);
 }
 
-int main(void)
+int main(int argc, char**argv)
 {
+    if(argc != 2) { printf("usage: sound_math <option>\n"); return 1;}
+
+    char* option = argv[1];
+
     sing("Ready");
-    /* 
-    TODO: command line switching between modes or...?
-    */
-    chord_test();
-    /* calibrate(); */
-    /* slide_test(); */
+
+    if( strcmp(option, "chord") == 0 )
+    {
+        chord_test();
+    }
+    else if( strcmp(option, "calibrate") == 0 )
+    {
+        printf("calibrate goes here\n");
+        /* calibrate(); */
+    }
+    else if( strcmp(option, "slide") == 0 )
+    {
+        printf("slide_test goes here\n");
+        /* slide_test(); */
+    }
+    else
+    {
+        printf("That option (%s) isn't defined yet.\n", option);
+    }
+
     return 0;
 }
 
