@@ -33,6 +33,8 @@ typedef struct {
 
 tone_table table;
 PaStream* stream;
+int steps = 40;
+int step_time = 20 Milliseconds;
 
 static int my_callback(
     const void*                     inputBuffer,
@@ -82,19 +84,29 @@ void sing(const char* s) {
     pclose(say);
 }
 
-void add_tone(float l_amp,float r_amp,float freq) {
+int tone_for(float freq) {
+    freq = fabs(freq);
+    for(int i=0;i<table.tones;i++)
+        if(fabs(table.tone[i].frequency-freq) < 1e-4) return i;
     int i = table.tones;
     /* TODO: Range check! */
     table.tones += 1;
-    table.tone[i].left_amplitude  = l_amp;
-    table.tone[i].right_amplitude = r_amp;
+    table.tone[i].left_amplitude  = 0.0;
+    table.tone[i].right_amplitude = 0.0;
     table.tone[i].amplitude_in    = 0.0;
     table.tone[i].frequency       = freq;
     table.tone[i].phase           = 0.0;
     table.tone[i].s_cross         = 0.0;
     table.tone[i].c_cross         = 0.0;
     table.tone[i].phase_increment = freq*2*Pi/Sample_rate;
+    return i;
 }
+
+void set_volume(int t,float l_amp,float r_amp) {
+    table.tone[t].left_amplitude  = l_amp;
+    table.tone[t].right_amplitude = r_amp;
+}
+
 
 #define Half_step 1.0594630943593
 #define Full_step (Half_step*Half_step)
@@ -128,6 +140,14 @@ void stop() {
     Pa_Terminate();
 }
 
+void start_listening() {
+    table.samples = 0;
+    for(int i=0;i<table.tones;i++) {
+        table.tone[i].s_cross = 0.0;
+        table.tone[i].c_cross = 0.0;
+    }
+}
+
 void report_what_we_heard() {
     for(int i=0;i<table.tones;i++) {
         printf("%8.3f (%5.3f) was at %10.5f\n",
@@ -138,116 +158,110 @@ void report_what_we_heard() {
     }
 }
 
-void heterodyne(float a,float b) {
+void heterodyne(float f1,float f2) {
     printf("Heterodyne\n");
-    int steps = 40;
-    int step_time = 20 Milliseconds;
 
     table.tones = 0;
-    add_tone(1.0,0.0,a);
-    add_tone(0.0,1.0,b);
-    add_tone(0.0,0.0,a-b);
-    add_tone(0.0,0.0,a+b);
+    int t1     = tone_for(f1);
+    int t2     = tone_for(f2);
+    int t_sum  = tone_for(f1+f2);
+    int t_diff = tone_for(f1-f2);
 
     for(int i=0;i < steps;i++) {
         float x = i*1.0/steps;
-        table.tone[1].left_amplitude  = x;
-        table.tone[0].right_amplitude = x;
+        set_volume(t1,1.0,  x);
+        set_volume(t2,  x,1.0);
         Pa_Sleep( step_time );
     }
 
     for(int i=0;i < steps;i++) {
         float x = i*1.0/steps;
-        table.tone[0].left_amplitude  = 1.0-x;
-        table.tone[0].right_amplitude = 1.0-x;
-        table.tone[1].left_amplitude  = 1.0-x;
-        table.tone[1].right_amplitude = 1.0-x;
-        table.tone[2].left_amplitude  = x;
-        table.tone[3].right_amplitude = x;
+        set_volume(t1,    1.0-x,1.0-x);
+        set_volume(t2,    1.0-x,1.0-x);
+        set_volume(t_sum,     x,0.01 );
+        set_volume(t_diff,0.01 ,    x);
         Pa_Sleep( step_time );
     }
 }
 
+#define No_such_tone (-1)
+void issolate_3(int t1, int t2, int t3) {
+    float ratio = 0.9;
+    for(int i=0;i < steps;i++) {
+        for(int t=0;t<table.tones;t++){
+            wave_form* w = &table.tone[t];
+            if(t == t1 || t == t2 || t == t3) {
+                w->left_amplitude  = 1.0 - (1.0-w->left_amplitude )*ratio;
+                w->right_amplitude = 1.0 - (1.0-w->right_amplitude)*ratio;
+            } else {
+                w->left_amplitude  *= ratio;
+                w->right_amplitude *= ratio;
+            }
+        }
+    }
+}
 
-void split(float a,float b, float c) {
+void issolate_2(int t1, int t2) {
+    issolate_3(t1,t2,No_such_tone);
+}
+
+void issolate(int t1) {
+    issolate_3(t1,No_such_tone,No_such_tone);
+}
+
+void split(float f1,float f2) {
     printf("split\n");
-    int steps = 40;
-    int step_time = 20 Milliseconds;
-
-    add_tone(1.0,0.0,a);
-    add_tone(0.0,1.0,b);
+    int t1 = tone_for(f1);
+    int t2 = tone_for(f2);
+    issolate_2(t1,t2);
 
     for(int i=0;i < steps;i++) {
         float x = i*1.0/steps;
-        if (fabs(c-table.tone[0].frequency) < fabs(a-b)/10.0) {
-            table.tone[0].right_amplitude = x;
-            table.tone[1].right_amplitude = 1.0-x;
-        } else {
-            table.tone[0].left_amplitude  = 1.0-x;
-            table.tone[1].left_amplitude  = x;
-        }
+        set_volume(t1,1.0,1.0-x);
+        set_volume(t2,1.0-x,1.0);
         Pa_Sleep( step_time );
     }
 }
 
 void h_add(float a,float b) {
     heterodyne(a,b);
-    split(fabs(a-b),a+b,a+b);
+    issolate(tone_for(a+b));
+    start_listening();
+    Pa_Sleep(steps*step_time);
 }
 
 void h_sub(float a,float b) {
     heterodyne(a,b);
-    split(fabs(a-b),a+b,fabs(a-b));
+    issolate(tone_for(a-b));
+    start_listening();
+    Pa_Sleep(steps*step_time);
 }
 
 void calibrate() {
-    add_tone(0.0,0.0,A_1*0.996);
-    add_tone(0.0,0.0,A_1*0.997);
-    add_tone(0.0,0.0,A_1*0.998);
-    add_tone(0.0,0.0,A_1*0.999);
-    add_tone(0.0,0.0,A_1);
-    add_tone(0.0,0.0,A_1*1.001);
-    add_tone(0.0,0.0,A_1*1.002);
-    add_tone(0.0,0.0,A_1*1.003);
-    add_tone(0.0,0.0,A_1*1.004);
+    table.tones = 0;
+    tone_for(A_1*0.996);
+    tone_for(A_1*0.997);
+    tone_for(A_1*0.998);
+    tone_for(A_1*0.999);
+    tone_for(A_1);
+    tone_for(A_1*1.001);
+    tone_for(A_1*1.002);
+    tone_for(A_1*1.003);
+    tone_for(A_1*1.004);
 
-    printf("Play you A-below-middle-C for the next ten seconds\n");
+    printf("Play your A-below-middle-C for the next ten seconds\n");
     Pa_Sleep( 10 Seconds );
 }
 
-void slide_test() {
-    add_tone(1.0,0.0,A_1);
-    add_tone(0.0,0.0,B_1);
-    add_tone(0.0,0.0,C_2);
-    add_tone(0.0,0.0,D_2);
-    add_tone(0.0,0.0,E_2);
-    add_tone(0.0,1.0,F_2);
-    add_tone(0.0,0.0,F_2-A_1);
-
-    for(int i=0;i < 100;i++) {
-        table.tone[2].left_amplitude = i*0.01;
-        table.tone[5].right_amplitude = (100-i)*0.01;
-        Pa_Sleep( 20 Milliseconds );
-    }
-
-    Pa_Sleep( 1 Second );
-
-    for(int i=0;i < 100;i++) {
-        table.tone[2].left_amplitude = (100-i)*0.01;
-        table.tone[5].right_amplitude = i*0.01;
-        Pa_Sleep( 20 Milliseconds );
-    }
-}
-
 void chord_test() {
-    add_tone(2.0,0.0,A_1);
-    add_tone(0.5,0.5,C_2);
-    add_tone(0.0,1.0,F_2);
-    add_tone(0.0,0.0,A_2);
+    table.tones = 0;
+    set_volume(tone_for(A_1),2.0,0.0);
+    set_volume(tone_for(C_2),0.5,0.5);
+    set_volume(tone_for(F_2),0.0,1.0);
 
     Pa_Sleep( 5 Seconds );
-    table.tone[0].left_amplitude = 0.0;
-    table.tone[3].left_amplitude = 1.0;
+    set_volume(tone_for(A_1),0.0,0.0);
+    set_volume(tone_for(A_2),1.0,0.0);
     Pa_Sleep( 5 Seconds );
 }
 
@@ -281,13 +295,10 @@ int main(int argc, char**argv) {
     } else if( strcmp(option, "calibrate") == 0 ) {
         printf("Calibrate.\n");
         calibrate();
-    } else if( strcmp(option, "slide") == 0 ) {
-        printf("Slide test.\n");
-        slide_test();
     } else if( strcmp(option, "heterodyne") == 0 ) {
         printf("Heterodyne test.\n");
-        h_sub(A_1,G_3);
-        h_add(A_1,G_3);
+        h_sub(A_1,C_3);
+        h_add(A_1,C_3);
     } else {
         printf("That option (%s) isn't defined yet.\n", option);
     }
