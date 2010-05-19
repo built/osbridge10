@@ -73,6 +73,12 @@ static int my_callback(
     return paContinue;
 }
 
+void sing(const char* s) {
+    FILE* say = popen("say -v cello","w");
+    fprintf(say,s);
+    pclose(say);
+}
+
 void add_tone(tone_table* table,float l_amp,float r_amp,float freq) {
     int i = table->tones;
     /* TODO: Range check! */
@@ -126,6 +132,83 @@ void report_what_we_heard(tone_table* table) {
            table->tone[i].amplitude_in/100.0
            );
     }
+}
+
+void heterodyne(float a,float b) {
+    printf("Heterodyne\n");
+    int steps = 40;
+    int step_time = 20 Milliseconds;
+
+    tone_table table;
+    table.tones = 0;
+    table.samples = 0;
+
+    add_tone(&table,1.0,0.0,a);
+    add_tone(&table,0.0,1.0,b);
+    add_tone(&table,0.0,0.0,a-b);
+    add_tone(&table,0.0,0.0,a+b);
+
+    PaStream* stream = start(&table);
+
+    for(int i=0;i < steps;i++) {
+        float x = i*1.0/steps;
+        table.tone[1].left_amplitude  = x;
+        table.tone[0].right_amplitude = x;
+        Pa_Sleep( step_time );
+    }
+
+    for(int i=0;i < steps;i++) {
+        float x = i*1.0/steps;
+        table.tone[0].left_amplitude  = 1.0-x;
+        table.tone[0].right_amplitude = 1.0-x;
+        table.tone[1].left_amplitude  = 1.0-x;
+        table.tone[1].right_amplitude = 1.0-x;
+        table.tone[2].left_amplitude  = x;
+        table.tone[3].right_amplitude = x;
+        Pa_Sleep( step_time );
+    }
+
+    stop(&stream);
+}
+
+
+void split(float a,float b, float c) {
+    printf("split\n");
+    return;
+    int steps = 40;
+    int step_time = 20 Milliseconds;
+
+    tone_table table;
+    table.tones = 0;
+    table.samples = 0;
+
+    add_tone(&table,1.0,0.0,a);
+    add_tone(&table,0.0,1.0,b);
+
+    PaStream* stream = start(&table);
+
+    for(int i=0;i < steps;i++) {
+        float x = i*1.0/steps;
+        if (fabs(c-table.tone[0].frequency) < fabs(a-b)/10.0) {
+            table.tone[0].right_amplitude = x;
+            table.tone[1].right_amplitude = 1.0-x;
+        } else {
+            table.tone[0].left_amplitude  = 1.0-x;
+            table.tone[1].left_amplitude  = x;
+        }
+        Pa_Sleep( step_time );
+    }
+    stop(&stream);
+}
+
+void h_add(float a,float b) {
+    heterodyne(a,b);
+    split(fabs(a-b),a+b,a+b);
+}
+
+void h_sub(float a,float b) {
+    heterodyne(a,b);
+    split(fabs(a-b),a+b,fabs(a-b));
 }
 
 void calibrate()
@@ -205,11 +288,21 @@ void chord_test()
     report_what_we_heard(&table);
 }
 
-void sing(const char* s) {
-    FILE* say = popen("say -v cello","w");
-    fprintf(say,s);
-    pclose(say);
+#define I    C_2
+#define II   C_3
+#define III  G_4
+#define IIII C_4
+#define V    E_2
+#define X    E_3
+#define XV   B_3
+#define E    Full_step
+
+int add(int a, int b) {
+
+return 0;
+
 }
+
 
 int main(int argc, char**argv)
 {
@@ -217,7 +310,7 @@ int main(int argc, char**argv)
 
     char* option = argv[1];
 
-    sing("Ready");
+    /* sing("Ready"); */
 
     if( strcmp(option, "chord") == 0 )
     {
@@ -233,6 +326,12 @@ int main(int argc, char**argv)
     {
         printf("Slide test.\n");
         slide_test();
+    }
+    else if( strcmp(option, "heterodyne") == 0 )
+    {
+        printf("Heterodyne test.\n");
+        h_sub(C_2,G_2);
+        h_add(C_2,G_2);
     }
     else
     {
