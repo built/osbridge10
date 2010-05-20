@@ -318,7 +318,7 @@ char listen_for_char() {
     int t_V    = tone_for(V);
     int t_RET  = tone_for(RET);
     int t_BS   = tone_for(BS);
-    int times_heard[MAX_TONES]; 
+    int times_heard[Max_tones]; 
     for(int i=0;i<table.tones;i++) times_heard[i] = 0;
     int tones_heard = 0;
     int tones_heard_this_time = 0;
