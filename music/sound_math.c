@@ -33,8 +33,8 @@ typedef struct {
 
 tone_table table;
 PaStream* stream;
-int steps = 40;
-int step_time = 20 Milliseconds;
+int steps = 80;
+int step_time = 40 Milliseconds;
 
 static int my_callback(
     const void*                     inputBuffer,
@@ -186,6 +186,7 @@ void heterodyne(float f1,float f2) {
 
 #define No_such_tone (-1)
 void issolate_3(int t1, int t2, int t3) {
+    printf("isolate\n");
     float ratio = 0.9;
     for(int i=0;i < steps;i++) {
         for(int t=0;t<table.tones;t++){
@@ -199,6 +200,11 @@ void issolate_3(int t1, int t2, int t3) {
             }
         }
     }
+    for(int t=0;t<table.tones;t++)
+        if(t == t1 || t == t2 || t == t3)
+            set_volume(t,1.0,1.0);
+        else
+            set_volume(t,0.0,0.0);
 }
 
 void issolate_2(int t1, int t2) {
@@ -267,11 +273,11 @@ void chord_test() {
 
 #define I    C_2
 #define II   C_3
-#define III  G_4
-#define IIII C_4
+#define III  (G_2*4)
+#define IIII (C_2*4)
 #define V    E_2
-#define X    E_3
-#define XV   B_3
+#define X    (E_2*2)
+#define XV   (B_2*2)
 #define E    Full_step
 
 int add(int a, int b) {
@@ -280,6 +286,40 @@ int add(int a, int b) {
 
 }
 
+void wait_for_pause() {
+    int done = 0;
+    while(!done) {
+        start_listening();
+        Pa_Sleep( 100 Milliseconds );
+        done = 1;
+        for(int i=0;i<table.tones;i++)
+            if (table.tone[i].amplitude_in > 0.01) done = 0;
+    }
+}
+
+float heard(int t) {
+    return table.tone[t].amplitude_in;
+}
+
+#define Threshold 0.01
+int input_int() {
+    wait_for_pause();
+    int done = 0;
+    int result = 0;
+    while(!done) {
+        start_listening();
+        Pa_Sleep( 100 Milliseconds );
+        done = 1;
+        for(int i=0;i<table.tones;i++)
+            if (table.tone[i].amplitude_in > Threshold) done = 0;
+    }
+    if (heard(tone_for(I))    > Threshold) result += 1;
+    if (heard(tone_for(II))   > Threshold) result += 2;
+    if (heard(tone_for(III))  > Threshold) result += 3;
+    if (heard(tone_for(IIII)) > Threshold) result += 4;
+    if (heard(tone_for(V))    > Threshold) result += 5;
+    return result;
+}
 
 int main(int argc, char**argv) {
     if(argc != 2) { printf("usage: sound_math <option>\n"); return 1;}
