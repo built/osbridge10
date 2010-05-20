@@ -113,10 +113,15 @@ void set_volume(int t,float l_amp,float r_amp) {
 #define A_1       220.0
 #define B_1       (A_1*Full_step)
 #define C_2       (B_1*Half_step)
+#define C_1       (C_2/2)
 #define D_2       (C_2*Full_step)
+#define D_1       (D_2/2)
 #define E_2       (D_2*Full_step)
+#define E_1       (E_2/2)
 #define F_2       (E_2*Half_step)
+#define F_1       (F_2/2)
 #define G_2       (F_2*Full_step)
+#define G_1       (G_2/2)
 #define A_2       (A_1*2)
 #define B_2       (B_1*2)
 #define C_3       (C_2*2)
@@ -271,14 +276,16 @@ void chord_test() {
     Pa_Sleep( 5 Seconds );
 }
 
-#define I    C_2
-#define II   C_3
-#define III  (G_2*4)
-#define IIII (C_2*4)
-#define V    E_2
-#define X    (E_2*2)
-#define XV   (B_2*2)
+#define I    C_1
+#define II   C_2
+#define III  G_2
+#define IIII (C_2*2)
+#define V    E_1
+#define X    E_2
+#define XV   B_2
 #define E    Full_step
+#define RET  A_1
+#define BS   D_1
 
 int add(int a, int b) {
 
@@ -286,38 +293,54 @@ int add(int a, int b) {
 
 }
 
-void wait_for_pause() {
-    int done = 0;
-    while(!done) {
-        start_listening();
-        Pa_Sleep( 100 Milliseconds );
-        done = 1;
-        for(int i=0;i<table.tones;i++)
-            if (table.tone[i].amplitude_in > 0.01) done = 0;
-    }
-}
-
-float heard(int t) {
-    return table.tone[t].amplitude_in;
-}
-
 #define Threshold 0.01
-int input_int() {
-    wait_for_pause();
-    int done = 0;
-    int result = 0;
-    while(!done) {
+char listen_for_char() {
+    int t_I    = tone_for(I);
+    int t_II   = tone_for(II);
+    int t_III  = tone_for(III);
+    int t_IIII = tone_for(IIII);
+    int t_V    = tone_for(V);
+    int t_RET  = tone_for(RET);
+    int t_BS   = tone_for(BS);
+    int times_heard[MAX_TONES]; 
+    for(int i=0;i<table.tones;i++) times_heard[i] = 0;
+    int tones_heard = 0;
+    int tones_heard_this_time = 0;
+    while(tones_heard == 0 || tones_heard_this_time > 0) {
         start_listening();
         Pa_Sleep( 100 Milliseconds );
-        done = 1;
+        tones_heard_this_time = 0;
         for(int i=0;i<table.tones;i++)
-            if (table.tone[i].amplitude_in > Threshold) done = 0;
+            if (table.tone[i].amplitude_in > Threshold) {
+                tones_heard_this_time += 1;
+                times_heard[i] += 1;
+            }
+        tones_heard += tones_heard_this_time;
     }
-    if (heard(tone_for(I))    > Threshold) result += 1;
-    if (heard(tone_for(II))   > Threshold) result += 2;
-    if (heard(tone_for(III))  > Threshold) result += 3;
-    if (heard(tone_for(IIII)) > Threshold) result += 4;
-    if (heard(tone_for(V))    > Threshold) result += 5;
+    int digit = 0;
+    for(int i=0;i<table.tones;i++)
+        if (times_heard[i] == 0);
+        else if (i == t_I)     digit += 1;
+        else if (i == t_II)    digit += 2;
+        else if (i == t_III)   digit += 3;
+        else if (i == t_IIII)  digit += 4;
+        else if (i == t_V)     digit += 5;
+        else if (i == t_RET)   return '\n';
+        else if (i == t_BS)    return '\b';
+    printf("digit = %i\n",digit);
+    return ('0'+digit);
+}
+
+int input_int() {
+    int result = 0;
+    char ch;
+    while((ch = listen_for_char()) != '\n') {
+        if (ch == '\b')
+            result = result / 10;
+        else
+            result = 10*result + ch - '0';
+        printf("%i\n",result);
+    }
     return result;
 }
 
@@ -339,6 +362,20 @@ int main(int argc, char**argv) {
         printf("Heterodyne test.\n");
         h_sub(A_1,C_3);
         h_add(A_1,C_3);
+    } else if( strcmp(option, "input") == 0) {
+        printf("Play a number and play RET; tone bindings are:\n\
+        #define I    C_1\n\
+        #define II   C_2\n\
+        #define III  G_2\n\
+        #define IIII (C_2*2)\n\
+        #define V    E_1\n\
+        #define X    E_2\n\
+        #define XV   B_2\n\
+        #define E    Full_step\n\
+        #define RET  A_1\n\
+        #define BS   D_1\n\
+       ");
+       printf("Read in %i\n",input_int());
     } else {
         printf("That option (%s) isn't defined yet.\n", option);
     }
