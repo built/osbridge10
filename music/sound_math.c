@@ -34,8 +34,8 @@ typedef struct {
 
 tone_table table;
 PaStream* stream;
-int steps = 80;
-int step_time = 40 Milliseconds;
+int steps = 20;
+int step_time = 20 Milliseconds;
 
 static int my_callback(
     const void*                     inputBuffer,
@@ -250,18 +250,20 @@ void split(float f1,float f2) {
     }
 }
 
-void h_add(float a,float b) {
+float h_add(float a,float b) {
     heterodyne(a,b);
     issolate(tone_for(a+b));
     start_listening();
     Pa_Sleep(steps*step_time);
+    return a+b;
 }
 
-void h_sub(float a,float b) {
+float h_sub(float a,float b) {
     heterodyne(a,b);
     issolate(tone_for(a-b));
     start_listening();
     Pa_Sleep(steps*step_time);
+    return a+b;
 }
 
 void calibrate() {
@@ -292,21 +294,56 @@ void chord_test() {
     Pa_Sleep( 5 Seconds );
 }
 
+#define RET  A_1
+#define EQ   B_1
 #define I    C_1
+#define BS   D_1
+#define V    E_1
+#define ADD  F_1
+#define ZERO G_1
 #define II   C_2
 #define III  G_2
-#define IIII (C_2*2)
-#define V    E_1
-#define X    E_2
 #define XV   B_2
+#define IIII (C_2*2)
 #define E    Full_step
-#define RET  A_1
-#define BS   D_1
+#define I5   (II+III)
+#define I6   (III+III)
+#define I7   (IIII+III)
+#define I8   (IIII+IIII)
 
 int add(int a, int b) {
+    int result = 0;
+    int place = 1;
+    int carry = 0;
+    while(a != 0 || b != 0 || carry != 0) {
+        int lda = a % 10;
+        int ldb = b % 10;
 
-    return 0;
+        /* In C we'd write: */
 
+        int digit_sum = lda+ldb;
+        int carry_out = digit_sum / 10;
+        digit_sum = digit_sum % 10;
+
+        /* Instead replace the above three lines with acoustic math: */
+
+        /* Split the digits to be added into Vs and Is */
+        int a_Is = lda % 5;   int a_Vs = lda/5;
+        int b_Is = ldb % 5;   int b_Vs = ldb/5;
+
+        /* Convert a_Is, etc. to t_a_Is,etc. */
+        int t_a_Is = a_Is*I;  int t_a_Vs = a_Vs*V;
+        int t_b_Is = b_Is*I;  int t_b_Vs = b_Vs*V;
+
+        h_add(h_add(E,t_a_Is),t_b_Is);
+        h_add(h_add(E,t_a_Vs),t_b_Vs);
+
+        result = result + place*(digit_sum+carry);
+        carry = carry_out;
+        a = a/10;
+        b = b/10;
+    }
+    return result;
 }
 
 #define Threshold 0.01
@@ -318,6 +355,9 @@ char listen_for_char() {
     int t_V    = tone_for(V);
     int t_RET  = tone_for(RET);
     int t_BS   = tone_for(BS);
+    int t_ADD  = tone_for(ADD);
+    int t_EQ   = tone_for(EQ);
+    int t_ZERO = tone_for(ZERO);
     int times_heard[Max_tones]; 
     for(int i=0;i<table.tones;i++) times_heard[i] = 0;
     int tones_heard = 0;
@@ -343,20 +383,34 @@ char listen_for_char() {
         else if (i == t_V)     digit += 5;
         else if (i == t_RET)   return '\n';
         else if (i == t_BS)    return '\b';
+        else if (i == t_ADD)   return '+';
+        else if (i == t_EQ)    return '=';
+        else if (i == t_ZERO)  return '0';
     printf("digit = %i\n",digit);
     return ('0'+digit);
 }
 
+char exit_char;
 int input_int() {
     int result = 0;
+    int digits_seen = 0;
     char ch;
-    while((ch = listen_for_char()) != '\n') {
-        if (ch == '\b')
-            result = result / 10;
-        else
-            result = 10*result + ch - '0';
+    exit_char = 0;
+    while(!exit_char) {
+        ch = listen_for_char();
+
+        if      (ch == '\b')             digits_seen -= 1;
+        else if (ch >= '0' && ch <= '9') digits_seen += 1;
+        if (digits_seen < 0) digits_seen = 0;
+
+        if      (ch == '\b')             result = result / 10;
+        else if (ch >= '0' && ch <= '9') result = 10*result + ch - '0';
+        else                             exit_char = ch;
+
         printf("%i\n",result);
     }
+    exit_char = ch;
+    if (digits_seen == 0) return -1;
     return result;
 }
 
@@ -366,7 +420,6 @@ int main(int argc, char**argv) {
     char* option = argv[1];
 
     start();
-    /* sing("Ready"); */
 
     if( strcmp(option, "chord") == 0 ){
         printf("Chord test.\n");
@@ -379,7 +432,7 @@ int main(int argc, char**argv) {
         h_sub(A_1,C_3);
         h_add(A_1,C_3);
     } else if( strcmp(option, "input") == 0) {
-        printf("Play a number and play RET; tone bindings are:\n\
+        printf("Play a number and play RET to push; EQ to pop; or <operator>; tone bindings are:\n\
         #define I    C_1\n\
         #define II   C_2\n\
         #define III  G_2\n\
@@ -389,9 +442,31 @@ int main(int argc, char**argv) {
         #define XV   B_2\n\
         #define E    Full_step\n\
         #define RET  A_1\n\
+        #define EQ   B_1\n\
         #define BS   D_1\n\
+        #define ADD  F_1\n\n\
+        For the real deal I plan to have the keys labled.\n\n\
        ");
-       printf("Read in %i\n",input_int());
+       int stack[1000];
+       int sp = 0;
+       int done = 0;
+       sing("Greetings");
+       while(!done) {
+           int x = input_int();
+           if (x >= 0) stack[sp++] = x;
+           if (exit_char == '+')
+               if (sp < 2) sing("Stack underflow\n");
+               else {
+                   int b = stack[--sp];
+                   int a = stack[--sp];
+                   stack[sp++] = add(a,b);
+               }
+           else if (exit_char == '=') {
+             if (sp == 0) done = 1;
+             else printf("Popping %i\n",stack[--sp]);
+           }
+       }
+       sing("Farewell");
     } else {
         printf("That option (%s) isn't defined yet.\n", option);
     }
