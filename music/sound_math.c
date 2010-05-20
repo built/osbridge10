@@ -3,9 +3,10 @@
 #include <math.h>
 #include <unistd.h>
 #include <string.h>
+#include <assert.h>
 
 #define Pi        (3.14159265)
-#define MAX_TONES (20)
+#define Max_tones (20)
 #define Stereo  2
 #define Mono    1
 #define Second  *1000
@@ -27,7 +28,7 @@ typedef struct {
 
 typedef struct {
     int       tones;
-    wave_form tone[MAX_TONES];
+    wave_form tone[Max_tones];
     long      samples;
 } tone_table;
 
@@ -84,12 +85,16 @@ void sing(const char* s) {
     pclose(say);
 }
 
-int tone_for(float freq) {
-    freq = fabs(freq);
-    for(int i=0;i<table.tones;i++)
-        if(fabs(table.tone[i].frequency-freq) < 1e-4) return i;
+#define Close_approximation 1e-4
+
+float diff(float f1, float f2) {
+    return fabs(f1 - f2);
+}
+
+int new_tone(float freq) {
+    assert(table.tones < Max_tones); // Range check!
+
     int i = table.tones;
-    /* TODO: Range check! */
     table.tones += 1;
     table.tone[i].left_amplitude  = 0.0;
     table.tone[i].right_amplitude = 0.0;
@@ -101,6 +106,17 @@ int tone_for(float freq) {
     table.tone[i].phase_increment = freq*2*Pi/Sample_rate;
     return i;
 }
+
+int tone_for(float freq) {
+    freq = fabs(freq);
+
+    for(int tone=0;tone<table.tones;tone++)
+        if( diff(table.tone[tone].frequency, freq) < Close_approximation) return tone;
+
+    // else capture that frequency in our table.
+    return new_tone(freq);
+}
+
 
 void set_volume(int t,float l_amp,float r_amp) {
     table.tone[t].left_amplitude  = l_amp;

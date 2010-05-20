@@ -1,0 +1,50 @@
+select * from dom where class = 'foo';
+
+$('.foo')
+
+
+
+
+
+select * from dom where class = 'foo';
+
+$('.foo')
+
+
+select 
+update
+insert
+
+
+
+What does the DOM table look like?
+
+id  |   class   |   parent   |   *attributes (pass through)
+---------------------------------------------------------------
+
+
+Find a particular item in 
+
+<script language="SQL">
+
+insert into server:blah 
+
+select * from 
+</script>
+
+The goal here is to 
+
+
+Don't just need an element table. Also need an event table so you can set up events.
+
+
+
+
+
+
+
+
+
+
+
+
