@@ -1,0 +1,11 @@
+
+
+# Select any element from the DOM by classname:
+
+$('.foo')  => select * from elements where class like "%foo%"
+
+
+$('#bar').addClass('foo') => insert into elements (class) values ("foo") where id="bar"
+
+
+
