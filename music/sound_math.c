@@ -35,7 +35,7 @@ typedef struct {
 tone_table table;
 PaStream* stream;
 int steps = 20;
-int step_time = 20 Milliseconds;
+int step_time = 10 Milliseconds;
 
 static int my_callback(
     const void*                     inputBuffer,
@@ -180,7 +180,8 @@ void report_what_we_heard() {
 }
 
 void heterodyne(float f1,float f2) {
-    printf("Heterodyne\n");
+    printf("Heterodyne...");
+    fflush(stdout);
 
     table.tones = 0;
     int t1     = tone_for(f1);
@@ -207,7 +208,9 @@ void heterodyne(float f1,float f2) {
 
 #define No_such_tone (-1)
 void issolate_3(int t1, int t2, int t3) {
-    printf("isolate\n");
+    printf("isolate...");
+    fflush(stdout);
+
     float ratio = 0.9;
     for(int i=0;i < steps;i++) {
         for(int t=0;t<table.tones;t++){
@@ -237,7 +240,9 @@ void issolate(int t1) {
 }
 
 void split(float f1,float f2) {
-    printf("split\n");
+    printf("split...");
+    fflush(stdout);
+
     int t1 = tone_for(f1);
     int t2 = tone_for(f2);
     issolate_2(t1,t2);
@@ -255,6 +260,7 @@ float h_add(float a,float b) {
     issolate(tone_for(a+b));
     start_listening();
     Pa_Sleep(steps*step_time);
+    table.tones = 0;
     return a+b;
 }
 
@@ -263,7 +269,8 @@ float h_sub(float a,float b) {
     issolate(tone_for(a-b));
     start_listening();
     Pa_Sleep(steps*step_time);
-    return a+b;
+    table.tones = 0;
+    return a-b;
 }
 
 void calibrate() {
@@ -278,7 +285,7 @@ void calibrate() {
     tone_for(A_1*1.003);
     tone_for(A_1*1.004);
 
-    printf("Play your A-below-middle-C for the next ten seconds\n");
+    printf("Play your A-above-middle-C for the next ten seconds\n");
     Pa_Sleep( 10 Seconds );
 }
 
@@ -305,13 +312,15 @@ void chord_test() {
 #define EQ   A_2
 #define XV   B_2
 #define IIII (C_2*2)
-#define E    Full_step
+#define E    (C_1/4)
 #define I5   (II+III)
 #define I6   (III+III)
 #define I7   (IIII+III)
 #define I8   (IIII+IIII)
 
 int add(int a, int b) {
+    int a_in = a;
+    int b_in = b;
     int result = 0;
     int place = 1;
     int carry = 0;
@@ -320,32 +329,48 @@ int add(int a, int b) {
         int ldb = b % 10;
 
         /* In C we'd write: */
-
+/*
         int digit_sum = lda+ldb;
         int carry_out = digit_sum / 10;
         digit_sum = digit_sum % 10;
-
-        /* Instead replace the above three lines with acoustic math: */
+*/
+        /* Instead we replace the above three lines with acoustic math: */
 
         /* Split the digits to be added into Vs and Is */
         int a_Is = lda % 5;   int a_Vs = lda/5;
         int b_Is = ldb % 5;   int b_Vs = ldb/5;
 
-        /* Convert a_Is, etc. to t_a_Is,etc. */
-        int t_a_Is = a_Is*I;  int t_a_Vs = a_Vs*V;
-        int t_b_Is = b_Is*I;  int t_b_Vs = b_Vs*V;
+        /* Convert a_Is, etc. to frequencies f_a_Is, etc. */
+        float f_a_Is = a_Is*I;  float f_a_Vs = a_Vs*V;
+        float f_b_Is = b_Is*I;  float f_b_Vs = b_Vs*V;
 
-        fabs(t_a_Is+t_b_Is+t_a_Vs+t_b_Vs);
-/*
-        h_add(h_add(E,t_a_Is),t_b_Is);
-        h_add(h_add(E,t_a_Vs),t_b_Vs);
-*/
-        result = result + place*(digit_sum+carry);
+        /* Add the Is & the carry */
+        printf("computing %i+%i+%i\n",lda,ldb,carry);
+        printf("    %i+%i+%i\n",a_Is,b_Is,carry);
+        float R1 = h_add(h_add(h_add(E,f_a_Is),f_b_Is),carry*I);
+        printf("\n%f = h_add(h_add(h_add(%f,%f),%f),%f)\n",R1,E,f_a_Is,f_b_Is,carry*I);
+
+        /* Add the Vs and possibly one extra V if the Is sumed to more than 4.5*I */
+        float R2 = (R1 > I*4.5) ? h_add(V,E) : E;
+        printf("    %i+%i+%i\n",5*a_Vs,5*b_Vs,5*(int) round((R2-E)/V));
+        float R3 = h_add(h_add(R2,f_a_Vs),f_b_Vs);
+        printf("\n%f = h_add(h_add(%f,%f),%f)\n",R3,R2,f_a_Vs,f_b_Vs);
+
+        /* Convert back to binary because we don't actually have series of tubes */
+        int digit_sum_Vs = round(R3/V);
+        int digit_sum = round(h_sub(R1,5*I*round(h_sub(R2,E)/V))/I)+5*digit_sum_Vs;
+
+        /* Carry out iff the Vs channel pitch is X or greater */
+        int carry_out = digit_sum_Vs/2;
+
+        printf("Sum Vs = %i, sum = %i, carry = %i\n",digit_sum_Vs,digit_sum,carry_out);
+        result = result + place*digit_sum;
         place *= 10;
         carry = carry_out;
         a = a/10;
         b = b/10;
     }
+    printf("%i + %i = %i\n",a_in,b_in,result);
     return result;
 }
 
