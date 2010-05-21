@@ -340,7 +340,8 @@ int add(int a, int b) {
         h_add(h_add(E,t_a_Is),t_b_Is);
         h_add(h_add(E,t_a_Vs),t_b_Vs);
 */
-        result = result*10 + place*(digit_sum+carry);
+        result = result + place*(digit_sum+carry);
+        place *= 10;
         carry = carry_out;
         a = a/10;
         b = b/10;
@@ -366,7 +367,7 @@ char listen_for_char() {
     int tones_heard_this_time = 0;
     while(tones_heard == 0 || tones_heard_this_time > 0) {
         start_listening();
-        Pa_Sleep( 100 Milliseconds );
+        Pa_Sleep( 30 Milliseconds );
         tones_heard_this_time = 0;
         for(int i=0;i<table.tones;i++) {
             float threshold = Threshold*table.tone[i].frequency/440.0;
@@ -380,10 +381,10 @@ char listen_for_char() {
     int total_score = 0;
     for(int i=0;i<table.tones;i++) {
         total_score += score[i];
-        printf("%i ",score[i]);
+        /* printf("%i ",score[i]); */
         }
     int average_score = total_score / table.tones;
-    printf("  ave = %i\n",average_score);
+    /* printf("  ave = %i\n",average_score); */
     int digit = 0;
     for(int i=0;i<table.tones;i++)
         if (score[i] <= average_score) /* ignore it */;
@@ -397,7 +398,6 @@ char listen_for_char() {
         else if (i == t_ADD)   return '+';
         else if (i == t_EQ)    return '=';
         else if (i == t_ZERO)  return '0';
-    printf("digit = %i\n",digit);
     return ('0'+digit);
 }
 
@@ -418,8 +418,10 @@ int input_int() {
         else if (ch >= '0' && ch <= '9') result = 10*result + ch - '0';
         else                             exit_char = ch;
 
-        printf("%i\n",result);
+        printf("\r%i \b",result);
+        fflush(stdout);
     }
+    printf("\n");
     exit_char = ch;
     if (digits_seen == 0) return -1;
     return result;
@@ -445,25 +447,21 @@ int main(int argc, char**argv) {
     } else if( strcmp(option, "input") == 0) {
         printf("Play a number and play RET to push; EQ to pop; or <operator>; tone bindings are:\n\
 \n\
-          middle-C\n\
-                 D\n\
-                 :\n\
-                 :\n\
-           tenor-C = I\n\
+          middle-C = I\n\
                  D = DEL\n\
                  E = V\n\
                  F\n\
                  G = ZERO\n\
                  A = RETURN\n\
                  B\n\
-            high-C = II\n\
+           tenor-C = II\n\
                  D = ADD\n\
                  E\n\
                  F\n\
                  G = III\n\
                  A = EQ\n\
                  B\n\
-                 C = IIII\n\
+            high-C = IIII\n\
 \n\
 To exit, pop the stack (with EQ) past empty.\n\
 For the real deal I plan to have the keys labled.\n\n\
