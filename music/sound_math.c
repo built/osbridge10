@@ -335,10 +335,12 @@ int add(int a, int b) {
         int t_a_Is = a_Is*I;  int t_a_Vs = a_Vs*V;
         int t_b_Is = b_Is*I;  int t_b_Vs = b_Vs*V;
 
+        fabs(t_a_Is+t_b_Is+t_a_Vs+t_b_Vs);
+/*
         h_add(h_add(E,t_a_Is),t_b_Is);
         h_add(h_add(E,t_a_Vs),t_b_Vs);
-
-        result = result + place*(digit_sum+carry);
+*/
+        result = result*10 + place*(digit_sum+carry);
         carry = carry_out;
         a = a/10;
         b = b/10;
@@ -442,20 +444,30 @@ int main(int argc, char**argv) {
         h_add(A_1,C_3);
     } else if( strcmp(option, "input") == 0) {
         printf("Play a number and play RET to push; EQ to pop; or <operator>; tone bindings are:\n\
-        #define I    C_1\n\
-        #define II   C_2\n\
-        #define III  G_2\n\
-        #define IIII (C_2*2)\n\
-        #define V    E_1\n\
-        #define X    E_2\n\
-        #define XV   B_2\n\
-        #define E    Full_step\n\
-        #define RET  A_1\n\
-        #define EQ   B_1\n\
-        #define BS   D_1\n\
-        #define ADD  F_1\n\n\
-        For the real deal I plan to have the keys labled.\n\n\
-       ");
+\n\
+          middle-C\n\
+                 D\n\
+                 :\n\
+                 :\n\
+           tenor-C = I\n\
+                 D = DEL\n\
+                 E = V\n\
+                 F\n\
+                 G = ZERO\n\
+                 A = RETURN\n\
+                 B\n\
+            high-C = II\n\
+                 D = ADD\n\
+                 E\n\
+                 F\n\
+                 G = III\n\
+                 A = EQ\n\
+                 B\n\
+                 C = IIII\n\
+\n\
+To exit, pop the stack (with EQ) past empty.\n\
+For the real deal I plan to have the keys labled.\n\n\
+");
        int stack[1000];
        int sp = 0;
        int done = 0;
@@ -474,6 +486,9 @@ int main(int argc, char**argv) {
              if (sp == 0) done = 1;
              else printf("Popping %i\n",stack[--sp]);
            }
+           printf("[");
+           for(int i=0;i<sp;i++) printf(" %i ",stack[i]);
+           printf("]\n");
        }
        sing("Farewell");
     } else {
