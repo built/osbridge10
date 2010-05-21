@@ -126,7 +126,7 @@ void set_volume(int t,float l_amp,float r_amp) {
 
 #define Half_step 1.0594630943593
 #define Full_step (Half_step*Half_step)
-#define A_1       220.0
+#define A_1       440.0
 #define B_1       (A_1*Full_step)
 #define C_2       (B_1*Half_step)
 #define C_1       (C_2/2)
@@ -295,14 +295,14 @@ void chord_test() {
 }
 
 #define RET  A_1
-#define EQ   B_1
 #define I    C_1
 #define BS   D_1
 #define V    E_1
-#define ADD  F_1
 #define ZERO G_1
 #define II   C_2
+#define ADD  D_2
 #define III  G_2
+#define EQ   A_2
 #define XV   B_2
 #define IIII (C_2*2)
 #define E    Full_step
@@ -346,7 +346,7 @@ int add(int a, int b) {
     return result;
 }
 
-#define Threshold 0.01
+#define Threshold 0.1
 char listen_for_char() {
     int t_I    = tone_for(I);
     int t_II   = tone_for(II);
@@ -358,24 +358,33 @@ char listen_for_char() {
     int t_ADD  = tone_for(ADD);
     int t_EQ   = tone_for(EQ);
     int t_ZERO = tone_for(ZERO);
-    int times_heard[Max_tones]; 
-    for(int i=0;i<table.tones;i++) times_heard[i] = 0;
+    int score[Max_tones]; 
+    for(int i=0;i<table.tones;i++) score[i] = 0;
     int tones_heard = 0;
     int tones_heard_this_time = 0;
     while(tones_heard == 0 || tones_heard_this_time > 0) {
         start_listening();
         Pa_Sleep( 100 Milliseconds );
         tones_heard_this_time = 0;
-        for(int i=0;i<table.tones;i++)
-            if (table.tone[i].amplitude_in > Threshold) {
+        for(int i=0;i<table.tones;i++) {
+            float threshold = Threshold*table.tone[i].frequency/440.0;
+            if (table.tone[i].amplitude_in > threshold) {
                 tones_heard_this_time += 1;
-                times_heard[i] += 1;
+                score[i] += table.tone[i].amplitude_in/threshold;
             }
+        }
         tones_heard += tones_heard_this_time;
     }
+    int total_score = 0;
+    for(int i=0;i<table.tones;i++) {
+        total_score += score[i];
+        printf("%i ",score[i]);
+        }
+    int average_score = total_score / table.tones;
+    printf("  ave = %i\n",average_score);
     int digit = 0;
     for(int i=0;i<table.tones;i++)
-        if (times_heard[i] == 0);
+        if (score[i] <= average_score) /* ignore it */;
         else if (i == t_I)     digit += 1;
         else if (i == t_II)    digit += 2;
         else if (i == t_III)   digit += 3;
