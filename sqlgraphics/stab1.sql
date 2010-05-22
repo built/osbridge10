@@ -164,7 +164,7 @@ insert into face
             image_xy(p3),
             image_xy(p4)],',')),
         the_color(0.8,0.8,0.0,0.5),
-        -1.0,
+        -3.0,
         the_vector(0.0,0.0,1.0)
       from
         (select
@@ -183,7 +183,7 @@ insert into face
             image_xy(p3),
             image_xy(p4)],',')),
         the_color(0.8,0.8,0.0,0.5),
-        -1.0,
+        -2.0,
         the_vector(0.0,0.0,1.0)
       from
         (select
@@ -213,18 +213,26 @@ create or replace function depth_of_intersection(point,face) returns real as $$
 --
 -- Accumulate colors as we walk the pixel-ray from back to front
 --
--- TODO: use delta_depth to scale alpha
+-- TODO: add shading / light angle for opaque surfaces
+--
 create or replace function add_color(spot,spot) returns spot as $$
     select 
         the_spot(
             $2.z,
             the_color(
-                cast(($1.c.r*$2.c.a+$2.c.r*(1.0-$2.c.a)) as real),
-                cast(($1.c.g*$2.c.a+$2.c.g*(1.0-$2.c.a)) as real),
-                cast(($1.c.b*$2.c.a+$2.c.b*(1.0-$2.c.a)) as real)
+                cast(($1.c.r*transparency+$2.c.r*(1.0-transparency)) as real),
+                cast(($1.c.g*transparency+$2.c.g*(1.0-transparency)) as real),
+                cast(($1.c.b*transparency+$2.c.b*(1.0-transparency)) as real)
             ),
             $2.normal
-        );
+        )
+      from (select 
+        case
+          when $2.c.a = 1.0      then 1.0
+          when $2.c.a = 0.0      then 0.0
+          when abs($2.z-$1.z)>6  then 0.0 -- TODO: this is wrong
+          else 1.0-power(1.0-$2.c.a,abs($2.z-$1.z)/6.0+0.001)
+        end as transparency) calcs;
     $$ language sql;
 
 create aggregate color_from  (
