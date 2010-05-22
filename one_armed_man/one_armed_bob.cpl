@@ -1,0 +1,100 @@
+A_hand = something_with {
+    state :holding,  :nothing,:milk,:bowl,:spoon,:cereal
+}
+
+A_fridge = something_with {
+    state :door, :closed,:open
+}
+
+A_cupboard = something_with {
+    state :door, :closed,:open
+}
+
+A_milk_bottle = something_with {
+    state :location,  :in_fridge,:mid_air,:on_counter
+}
+
+A_cereal_box = something_with {
+    state :location,  :in_cupboard,:mid_air,:on_counter
+}
+
+A_spoon = something_with {
+    state :location,  :in_cupboard,:on_counter
+}
+
+A_bowl = something_with {
+    state :location,  :in_cupboard,:on_counter
+    state :contains_cereal
+    state :contains_milk
+}
+
+
+Hand = A_hand.new('your hand',
+    :transitions => ({
+        [:holding,:spoon, :nothing] => {:requires => [["Spoon", :location,:on_counter]]},
+        [:holding,:bowl,  :nothing] => {:requires => [["Bowl",  :location,:on_counter]]},
+        [:holding,:milk,  :nothing] => {:requires => [["Milk",  :location,:on_counter]]},
+        [:holding,:cereal,:nothing] => {:requires => [["Cereal",:location,:on_counter]]}
+    }.merge(
+        (os = [:spoon,:bowl,:milk,:cereal]).inject({}) { |h,o|
+            (os-[o]).inject(h) { |h,o2| h[[:holding,o,o2]] = {:requires => [["Hand",:holding,o2]]}; h }
+        }
+    ))
+)
+Fridge   = A_fridge.new('the fridge', 
+    :door => :closed,
+    :side_effects => [
+        [:door,:open,0,5],
+    ],
+    :transitions => {
+        [:door,:open,:closed] => {:takes => 1.second},
+        [:door,:closed,:open] => {:takes => 1.second,:requires => [[Hand,:holding,:nothing]]}
+    }
+)
+Cupboard = A_cupboard.new('the cupboard', 
+    :door => :closed,
+    :transitions => {
+        [:door,:open,:closed] => {:takes => 1.second},
+        [:door,:closed,:open] => {:takes => 1.second,:requires => [[Hand,:holding,:nothing]]}
+    }
+)
+Milk = A_milk_bottle.new('the milk',
+    :location => :in_fridge,
+    :side_effects => [
+        [:location,[:mid_air,:in_cupboard,:on_counter],0,1]
+    ],
+    :transitions => {
+        [:location,'*',:mid_air]   => {:requires => [[Hand,:holding,:milk]]},
+        [:location,'*',:in_fridge] => {:requires => [[Fridge,:door,:open],[Hand,:holding,:nothing]]},
+        [:location,:in_fridge,'*'] => {:requires => [[Fridge,:door,:open]]}
+    }
+)
+Cereal = A_cereal_box.new('the cereal',
+    :location => :in_cupboard,
+    :transitions => {
+        [:location,'*',:mid_air]     => {:requires => [[Hand,:holding,:cereal]]},
+        [:location,'*',:in_cupboard] => {:requires => [[Cupboard,:door,:open],[Hand,:holding,:nothing]]},
+        [:location,:in_cupboard,'*'] => {:requires => [[Cupboard,:door,:open]]}
+    }
+)
+Spoon = A_spoon.new('the spoon',
+    :location => :on_counter,
+    :transitions => {
+        [:location,:on_counter,:in_cupboard] => {:takes => 1.second,:requires => [[Cupboard,:door,:open],[Hand,:holding,:nothing]]},
+        [:location,:in_cupboard,:on_counter] => {:takes => 1.second,:requires => [[Cupboard,:door,:open],[Hand,:holding,:nothing]]}
+    }
+)
+
+Bowl = A_bowl.new('the bowl',
+    :location => :on_counter,
+    :contains_cereal => true,
+    :contains_milk => true,
+    :transitions => {
+        [:location,:on_counter,:in_cupboard] => {:takes => 1.second,:requires => [[Cupboard,:door,:open],[Hand,:holding,:nothing]]},
+        [:location,:in_cupboard,:on_counter] => {:takes => 1.second,:requires => [[Cupboard,:door,:open],[Hand,:holding,:nothing]]},
+        [:contains_milk,  false,true] => {:requires => [["Bowl",:location,:on_counter],[Milk,:location,:mid_air]]},
+        [:contains_cereal,false,true] => {:requires => [["Bowl",:location,:on_counter],[Cereal,:location,:mid_air]]}
+    }
+)
+
+
