@@ -31,14 +31,14 @@ drop type  if exists spot   cascade;
 
 -- COLOR:
 create type color as (r real, g real, b real, a real);
-create function the_color(real,real,real) returns color as 'select $1,$2,$3,$1-$1;' language sql;
+create or replace function the_color(real,real,real) returns color as 'select $1,$2,$3,$1-$1;' language sql;
 
 -- VECTOR:
 create type vector as (x real, y real, z real);
-create function the_vector(real,real,real) returns vector as $$
+create or replace function the_vector(real,real,real) returns vector as $$
     select $1,$2,$3;
     $$ language sql;
-create function dot(vector,vector) returns real as $$
+create or replace function dot(vector,vector) returns real as $$
     select $1.x*$2.x + $1.y*$2.y + $1.z*$2.z;
     $$ language sql;
 
@@ -47,25 +47,32 @@ create table face (perimeter polygon, c color, z0 real, normal vector);
 
 -- SPOT: A pixel's worth of color at a specified distance from and angle to the viewer
 create type spot as (z real, c color, normal vector);
-create function the_spot(real,color,vector) returns spot as 'select $1,$2,$3;' language sql;
-create function color_of(spot) returns color as 'select $1.c;' language sql;
+create or replace function the_spot(real,color,vector) returns spot as 'select $1,$2,$3;' language sql;
+create or replace function color_of(spot) returns color as 'select $1.c;' language sql;
 
 --
 -- Set up the image to render; normally this would come from outside
 --
 -- TODO: Get real / interesting image data in here!
--- TODO: This way of projecting sucks
--- TODO: Figure out how to have globals / constants for height / width, etc.
+-- TODO: This way of projecting still sort of sucks
+WIDTH=500
+HEIGHT=350
+create or replace function image_x(real,real,real) returns real as $$
+     select cast(<WIDTH>/2 + $1*220/(220+$2) as real);
+     -- 220 arbitrary scaling of perspecive
+  $$ language sql;
 
-drop function if exists image_xy(real,real,real);
-create function image_xy(real,real,real) returns text as $$
-    select 
-        to_char((100+$1*220/(220+$2)),'999999.99') 
-        --      100=w/2; 220 arbitrary scaling of perspecive
+create or replace function image_y(real,real,real) returns real as $$
+     select cast(<HEIGHT>+50-(($2*160-$3*60)/(220+$2) as real);
+     -- 50 = offset to hide ugly bottom; 160+60=220 perspective scaling & tilt
+  $$ language sql;
+
+create or replace function image_xy(x real, y real, z real) returns text as $$
+    select
+        to_char(image_x($1,$2,$3),'999999.99') 
         || ',' || 
-        to_char(150+50-(($2*160-$3*60)/(220+$2)),'999999.99'); 
-        --   150=h; 50 = offset to hide ugly bottom; 160+60=220 perspective scaling & tilt
-    $$ language sql;
+        to_char(image_y($1,$2,$3),'999999.99');
+  $$ language sql;
 
 insert into face
     select
@@ -82,7 +89,7 @@ insert into face
         0.0,
         the_vector(0.0,0.0,1.0)
       from
-        (select 25 as s, -10 as z) const 
+        (select (<HEIGHT>+<WIDTH>)/10 as s, (<HEIGHT>+<WIDTH>)/-35 as z) const 
       cross join
         (select generate_series(-15,15) as i) i 
       cross join
@@ -98,7 +105,7 @@ insert into face values ( '( (-Infinity,-Infinity),(-Infinity,Infinity), (Infini
 --
 -- How far back from the viewer is the spot where the pixel-ray intersects the polygon
 --
-create function depth_of_intersection(point,face) returns real as $$
+create or replace function depth_of_intersection(point,face) returns real as $$
     select cast($2.z0 + $2.normal.x*$1[0] + $2.normal.y*$1[1] as real);
     $$ language sql;
 
@@ -106,7 +113,7 @@ create function depth_of_intersection(point,face) returns real as $$
 -- Accumulate colors as we walk the pixel-ray from back to front
 --
 -- TODO: use alpha and normal to blend, rather than just treating all spots as opaque/matte blobs
-create function add_color(spot,spot) returns spot as $$
+create or replace function add_color(spot,spot) returns spot as $$
     select $2;
     $$ language sql;
 
@@ -136,7 +143,7 @@ select
     f.c as c,
     f.normal as n
   from 
-    (select generate_series(1,150) as y) y cross join (select generate_series(1,200) as x) x left join 
+    (select generate_series(1,<HEIGHT>) as y) y cross join (select generate_series(1,<WIDTH>) as x) x left join 
   face f on f.perimeter ~ point(x.x,y.y)
   order by y desc,x,z desc
 ) v
