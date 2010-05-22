@@ -57,13 +57,14 @@ create or replace function color_of(spot) returns color as 'select $1.c;' langua
 -- TODO: This way of projecting still sort of sucks
 WIDTH=500
 HEIGHT=350
+SCALE=(<HEIGHT>+<WIDTH>)/2
 create or replace function image_x(real,real,real) returns real as $$
      select cast(<WIDTH>/2 + $1*220/(220+$2) as real);
      -- 220 arbitrary scaling of perspecive
   $$ language sql;
 
 create or replace function image_y(real,real,real) returns real as $$
-     select cast(<HEIGHT>+50-(($2*160-$3*60)/(220+$2) as real);
+     select cast(<HEIGHT>+50-(($2*160-$3*60)/(220+$2)) as real);
      -- 50 = offset to hide ugly bottom; 160+60=220 perspective scaling & tilt
   $$ language sql;
 
@@ -89,7 +90,7 @@ insert into face
         0.0,
         the_vector(0.0,0.0,1.0)
       from
-        (select (<HEIGHT>+<WIDTH>)/10 as s, (<HEIGHT>+<WIDTH>)/-35 as z) const 
+        (select 0.2*<SCALE> as s, (<HEIGHT>+<WIDTH>)/-35 as z) const 
       cross join
         (select generate_series(-15,15) as i) i 
       cross join

@@ -2,6 +2,10 @@
 constants = {}
 src = File.read('stab1.sql').
     gsub(/^([A-Z]+)=(.*)$/) { constants[$1] = $2; '' }.
+    gsub(/<([A-Z]+)>/) { constants[$1] }.
+    gsub(/<([A-Z]+)>/) { constants[$1] }.
+    gsub(/<([A-Z]+)>/) { constants[$1] }.
+    gsub(/<([A-Z]+)>/) { constants[$1] }.
     gsub(/<([A-Z]+)>/) { constants[$1] }
 results = IO.popen("/sw/bin/psql",'r+') { |sql|
     sql.print src
