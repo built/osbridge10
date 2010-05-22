@@ -188,11 +188,13 @@ def make_it_so
         c,x,op = *reachable_states[x]
     end
     ans.shift
-    puts "Answer (#{ans.length} steps):"
+    puts "Answer (#{ans.length} steps, total cost: #{(ans.first||{})[0]}):"
     #p ans.reverse
     ans.reverse.each { |s|
         if s.length == 3
             puts "%s.%s <-- %s" % s
+        elsif false
+            puts s[0]
         elsif false
             puts ((("    (%s) "+"  \t%s.%s:%s"*s[1].length).gsub(/((  \t%s.%s:%s){3})/,"\\1\n    ")  % ([s[0]]+state_dimensions.zip(s[1]).flatten)).gsub(/the /,''))
         end
