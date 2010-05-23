@@ -32,7 +32,6 @@ class A_resource
         @name = name
         Known_resources << self
         @state = {}
-        puts "#{name} transitions:"
         @transitions = {}
         (args.delete(:transitions)||{}).each { |pvv,x|
             p,*vv = *pvv
@@ -50,6 +49,7 @@ class A_resource
                 @transitions[k][:requires] |= x[:requires] || []
             }}
         }
+        #puts "#{name} transitions:"
         #@transitions.each { |k,v|
         #    p [k.join(':'),v.collect { |x| x.join(':') }]
         #}
@@ -100,11 +100,17 @@ def neighbors(s)
     result
 end
 
+def printable_state(s)
+    tagged_values = $sd.zip(s).collect { |rp,v| ("%s.%s:%s" % [rp[0],rp[1],v]).gsub(/the /,'') } 
+    format = ("\t%30s"*s.length).gsub(/((\t%30s){3})/,"\\1\n") 
+    format % tagged_values
+end
+
 def make_it_so
     #
     #
     #
-    puts "Identifying substates of interest"
+    puts "Identifying sub-states of interest"
     srand
     substates_of_interest = Hash.new { |h,k| h[k] = [] }
     Known_resources.each { |r|
@@ -118,9 +124,9 @@ def make_it_so
              #puts "#{r}.#{p} is #{r[p]} instead of #{v}" unless r[p] == v
          }
     }
-    # puts "unaugmented:",substates_of_interest.collect { |rp,vs| "#{rp.join('.')} in #{vs.inspect}" }.join('; ')
+    # puts "unaugmented:",sub-states_of_interest.collect { |rp,vs| "#{rp.join('.')} in #{vs.inspect}" }.join('; ')
     substates_of_interest.each { |rp,vs| r,p = *rp; vs << r.type.states[p]; vs.flatten!; vs.uniq! }
-    # puts "augmented:",substates_of_interest.collect { |rp,vs| "#{rp.join('.')} in #{vs.inspect}" }.join('; ')
+    # puts "augmented:",sub-states_of_interest.collect { |rp,vs| "#{rp.join('.')} in #{vs.inspect}" }.join('; ')
     done = false
     while !done
         done = true
@@ -196,9 +202,19 @@ def make_it_so
         elsif false
             puts s[0]
         elsif false
-            puts ((("    (%s) "+"  \t%s.%s:%s"*s[1].length).gsub(/((  \t%s.%s:%s){3})/,"\\1\n    ")  % ([s[0]]+state_dimensions.zip(s[1]).flatten)).gsub(/the /,''))
+            puts (("    (%s) " % s[0])+printable_state(s[1]))
         end
     }
+    if ans.first and true
+        puts "Results in:"
+        final_state = printable_state(ans.first[1])
+        puts final_state
+        %w{
+            hand.holding:nothing            cupboard.door:closed            milk.location:in_fridge
+            cereal.location:in_cupboard     bowl.contains_cereal:true       bowl.contains_milk:true
+            bowl.location:on_counter        spoon.location:on_counter       fridge.door:closed
+        }.each { |s| puts "Should have #{s}\n" unless final_state.include? s }
+    end
 end
 
 def something_with(&block)
