@@ -1,4 +1,8 @@
-
+#!/usr/bin/env ruby
+postgres = "/sw/bin/psql" # Default to Markus' install
+unless File.exists? postgres
+  postgres = "/Library/PostgreSQL/8.3/bin/psql -U postgres" # Fall back to Matt's
+end
 constants = {}
 src = File.read('stab1.sql').
     gsub(/^([A-Z_]+)=(.*)$/) { constants[$1] = $2; '' }.
@@ -7,7 +11,7 @@ src = File.read('stab1.sql').
     gsub(/<([A-Z_]+)>/) { constants[$1] }.
     gsub(/<([A-Z_]+)>/) { constants[$1] }.
     gsub(/<([A-Z_]+)>/) { constants[$1] }
-results = IO.popen("/sw/bin/psql",'r+') { |sql|
+results = IO.popen(postgres,'r+') { |sql|
     sql.print src
     sql.close_write
     sql.read
