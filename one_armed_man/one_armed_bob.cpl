@@ -34,13 +34,13 @@ A_bowl = something_with {
 
 Hand = A_hand.new('your hand',
     :transitions => ({
-        [:holding,:spoon, :nothing] => {:requires => [that Spoon location be on_counter]},
-        [:holding,:bowl,  :nothing] => {:requires => [that Bowl location be on_counter]},
-        [:holding,:milk,  :nothing] => {:requires => [that Milk location be on_counter]},
-        [:holding,:cereal,:nothing] => {:requires => [that Cereal location be on_counter]}
+        [:holding,:spoon, :nothing] => {:requires => [that Spoon be on_counter]},
+        [:holding,:bowl,  :nothing] => {:requires => [that Bowl be on_counter]},
+        [:holding,:milk,  :nothing] => {:requires => [that Milk be on_counter]},
+        [:holding,:cereal,:nothing] => {:requires => [that Cereal be on_counter]}
     }.merge(
         (os = [:spoon,:bowl,:milk,:cereal]).inject({}) { |h,o|
-            (os-[o]).inject(h) { |h,o2| h[[:holding,o,o2]] = {:requires => [that Hand be holding o2]}; h }
+            (os-[o]).inject(h) { |h,o2| h[[:holding,o,o2]] = {:requires => [["Hand",:holding,o2]]}; h }
         }
     ))
 )
@@ -114,10 +114,10 @@ Bowl = A_bowl.new('the bowl',
             :requires => [that Cupboard door be open,that Hand be holding nothing]
         },
         [:contains_milk,  false,true] => {
-            :requires => [that Bowl location be on_counter, that Milk location be mid_air]
+            :requires => [that Bowl be on_counter, that Milk be mid_air]
         },
         [:contains_cereal,false,true] => {
-            :requires => [that Bowl location be on_counter,that Cereal location be mid_air]
+            :requires => [that Bowl be on_counter,that Cereal be mid_air]
         }
     }
 )
