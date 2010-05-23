@@ -6,20 +6,109 @@
 	<title>untitled</title>
 	<meta name="generator" content="TextMate http://macromates.com/">
 	<meta name="author" content="Matt Youell">
-	<!-- Date: 2010-05-16 -->
+
+	<style>
+	.box {
+	    border: 1px solid #ccc;
+	    background-color: #eee;
+    }
+    .foo {
+        background-color: #eee;
+    }
+    
+    #txt_email, #txt_password {
+     width: 100%;   
+    }
+    
+	</style>
+	<script src="jquery-1.4.2.min.js"></script>
+	<script>
+	$(function() {
+	    var divs = $('div'); // Need to better understand how to iterate over these.
+	    divs.addClass("foo");
+	    
+	    $('input[type=text]').each( function(){
+	        console.log( $(this).attr("id") );
+        });
+	    
+	    var sql = $('script[language=SQL]').text().trim();
+	    
+	    if( (/^select/i).test(sql) ) {
+	     
+	     console.log("that's a select statement.");
+	     
+	     console.log("SQL: " + sql);
+	     
+	     matches = {}
+	     
+	     matches = sql.match(/^select (.*)/g);
+	     
+	     console.log("Matches: " + matches[0]);
+	     
+        }
+        else {
+            console.log("that's not a select statement?");
+	    }
+	    
+    });
+	</script>
+
 	<script language="SQL">
-	insert into events where event="submit" and target="";
-	select from * where blah;
-	select from * where blah;
+	select id, value from #registration_form where input_type="text";
 	</script>
 </head>
 <body>
 
-<form id="foo">
-    <input>
-    <input>
-    <input>
+<div id="box-A" class="box">
+    A
+    <h5>foo</h5>
+</div>
+
+<div id="box-B" class="box">
+    B
+</div>
+
+<div id="box-C" class="box">
+    C
+</div>
+    
+<div id="box-D" class="box">
+    D
+</div>
+
+<div id="box-E" class="box">
+    E
+</div>
+
+<form id="registration_form">
+<table style="border: 1px dashed #ccc">
+    <tr>
+        <td>First</td>
+        <td>Last</td>
+    </tr>
+    <tr>
+        <td><input type="text" id="txt_name_first"></td>
+        <td><input type="text" id="txt_name_last"></td>
+    </tr>
+    <tr>
+        <td colspan="2">Email</td>
+    </tr>
+    <tr>
+        <td colspan="2"><input type="text" id="txt_email"></td>
+    </tr>
+    <tr>
+        <td colspan="2">Password</td>
+    </tr>
+    <tr>
+        <td colspan="2"><input type="text" id="txt_password"></td>
+    </tr>
+    <tr>
+        <td align="right" colspan="2"><input type="submit" id="btn_submit"></td>
+    </tr>
+</table>
 </form>
 
+
+    
 </body>
 </html>
