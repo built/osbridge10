@@ -228,7 +228,9 @@ problem = File.read(ARGV.first+'.cpl').
   gsub(/^ *state +([a-z_]+) *$/,' state :\1').
   gsub(/that +([A-Z][a-z]*) +([a-z_]+) +be +([a-z_0-9]+)/,'["\1",:\2,:\3]').
   gsub(/that +([A-Z][a-z]*) +be +([a-z_]+) +([a-z_0-9]+)/,'["\1",:\2,:\3]').
-  gsub(/that +([A-Z][a-z]*) +be +([a-z_0-9]+) *([,\])]|$)/,'["\1",:location,:\2]\3')
+  gsub(/that +([A-Z][a-z]*) +be +([a-z_0-9]+) *([,\])]|$)/,'["\1",:location,:\2]\3').
+  gsub(/takes +(\d+\.?\d*) +seconds?/,':takes => \1.second').
+  gsub(/requires +/,':requires => ')
 
 #print problem
 eval problem
