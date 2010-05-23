@@ -26,7 +26,7 @@ class Resource_type
 end
 
 class A_resource
-    attr_reader :type,:should,:name,:transitions,:side_efects
+    attr_reader :type,:should,:name,:transitions,:cost
     def initialize(type,name,args={})
         @type = type
         @name = name
@@ -53,18 +53,25 @@ class A_resource
         #@transitions.each { |k,v|
         #    p [k.join(':'),v.collect { |x| x.join(':') }]
         #}
-        @side_effects = []
-        (args.delete(:side_effects)||[]).each { |t|
-            # TODO: remember what was supposed to go here, and write it
-        }
+        @cost = args.delete(:cost)
         @should = args
         @type.states.each { |prop,vals| @state[prop] = vals.first }
     end
-    def [](prop)
-        @state[prop]
+    def [](*args)
+        prop = args.shift
+        if args.empty?
+            # The value in our current state
+            @state[prop]                 
+        else
+            # The value in a specified state
+            args.last[$sd.index([self,prop])] 
+        end
     end
     def to_s
         name
+    end
+    def state_cost(world)
+        @cost ? @cost.call(self,world) : 0.0
     end
 end
 
@@ -73,14 +80,22 @@ def cost(a,b,delta_t)
 end
 
 
-# TODO: the data for this should come from the cpl file (in the resources) instead of being hard coded
 def state_cost(a)
-    0.5+rand/10000.0+
-      ((a[$sd.index([Milk,:location])] == :fridge) ? 0.0 : 2.0)+
-      ((a[$sd.index([Fridge,:door])] == :closed) ? 0.0 : 2.5) +
-      ((a[$sd.index([Bowl,:contains_milk])] and not a[$sd.index([Bowl,:contains_cereal])]) ? 0.5 : 0.0)
+    rand/10000.0+Known_resources.inject(0) { |t,r| t+r.state_cost(a) }
 end
 
+# Returns an array of the neighbors of s (all the states that can be reached 
+# in one step without violating any constraints).  Each neighhbor in this 
+# array is represented by an array of four elements: the resulting state, the 
+# transition to get there, and the time it takes to do so (defaulting to 1 
+# second if no time was specified).
+#
+# Transitions are represented as a three element array: the resource, the 
+#     property being changed, and its new value
+#
+# States are represented as arrays of values for all the properties of interest
+#     Ordered according to the state_dimensions list in $sd
+#   
 def neighbors(s)
     result = []
     $sd.each_with_index { |rp,i|
@@ -164,6 +179,7 @@ def make_it_so
     front = neighbors(current_state).collect { |n,op,delta_t| [n,cost(current_state,n,delta_t),current_state,op] }
     op = x = nil
     while (x,c,b,op = front.shift) and x do
+        #front.reject! { |f| f[0] == x }
 
         # TODO: Instead of just skipping if we've already found a way to the state we need to
         #       update it if it's in the front and the path we just found is cheaper than the
@@ -230,7 +246,12 @@ problem = File.read(ARGV.first+'.cpl').
   gsub(/that +([A-Z][a-z]*) +be +([a-z_]+) +([a-z_0-9]+)/,'["\1",:\2,:\3]').
   gsub(/that +([A-Z][a-z]*) +be +([a-z_0-9]+) *([,\])]|$)/,'["\1",:location,:\2]\3').
   gsub(/takes +(\d+\.?\d*) +seconds?/,':takes => \1.second').
-  gsub(/requires +/,':requires => ')
+  gsub(/requires +/,':requires => ').
+  gsub(/^ *cost *$/,                                             ' :cost => lambda {|obj,world| case ').
+  gsub(/^ +when +([a-z_]+) +is +([a-z_]+) +then +(\d+\.?\d*) *$/,'   when  obj[:\1,world] == :\2; \3'  ).
+  gsub(/^ +when +([a-z_]+) +then +(\d+\.?\d*) *$/,               '   when  obj[:\1,world]; \2'        ).
+  gsub(/^ +when +not +([a-z_]+) +then +(\d+\.?\d*) *$/,          '   when !obj[:\1,world]; \2'        ).
+  gsub(/^ +otherwise +(\d+\.?\d*) *$/,                           '   else \1; end},'                  )
 
 #print problem
 eval problem

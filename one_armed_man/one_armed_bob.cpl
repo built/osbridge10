@@ -46,9 +46,9 @@ Hand = A_hand.new('your hand',
 )
 Fridge   = A_fridge.new('the fridge', 
     :door => :closed,
-    :side_effects => [
-        [:door,:open,0,5],
-    ],
+    cost
+        when door is open then 5
+        otherwise 0.0
     :transitions => {
         [:door,:open,:closed] => {
             takes 1 second
@@ -73,9 +73,9 @@ Cupboard = A_cupboard.new('the cupboard',
 )
 Milk = A_milk_bottle.new('the milk',
     :location => :in_fridge,
-    :side_effects => [
-        [:location,[:mid_air,:in_cupboard,:on_counter],0,1]
-    ],
+    cost 
+       when location is fridge then 0.0
+       otherwise 2.0
     :transitions => {
         [:location,'*',:mid_air]   => {requires [that Hand be holding milk]},
         [:location,'*',:in_fridge] => {requires [that Fridge door be open, that Hand be holding nothing]},
@@ -108,6 +108,13 @@ Bowl = A_bowl.new('the bowl',
     :location => :on_counter,
     :contains_cereal => true,
     :contains_milk => true,
+    cost
+        # we have a mild disinclination to add the milk
+        # before the cereal, because it's more likely to
+        # splash.
+        when contains_cereal then 0.0
+        when not contains_milk then 0.0
+        otherwise 0.5
     :transitions => {
         [:location,:on_counter,:in_cupboard] => {
             takes 1 second,
