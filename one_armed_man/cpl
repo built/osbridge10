@@ -221,7 +221,14 @@ def something_with(&block)
     Resource_type.new(&block)
 end
 
-eval File.read(ARGV.first+'.cpl')
+problem = File.read(ARGV.first+'.cpl').
+  gsub(/^ *state +([a-z_]+) +can +be +(([a-z_]+, *)*[a-z_]+ +or +[a-z_]+) *$/) { 
+      " state :#{$1}, :#{$2.gsub(/(, *| +or +)/,',:')}"
+  }.
+  gsub(/^ *state +([a-z_]+) *$/,' state :\1')
+
+#print problem
+eval problem
 
 make_it_so
 
