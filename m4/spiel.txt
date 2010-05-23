@@ -1,0 +1,90 @@
+
+One of the stranger alternate realities we considered was one in which whacking things with 
+a hammer didn't involve looking at them as nails, or even looking at them at all.  It was a 
+world in which the correctness of a solution was irrelevant compared to the ease of implementing
+it.  A world where the first recourse to diagnosing a failing system was simply turn it off and
+then on again, and pretend the problem hadn't happened.  A world where people "fixed" complicated
+systems by whcking them or pouring random chemicals on them.  Otherwise, it was very much like
+our world.
+
+Now in this world, as in ours, people had to write config files.  A common problem in both worlds
+is that such files often contain redundant information; we see things like:
+
+install_dir = /usr/local/foo/
+lib_dir     = /usr/local/foo/lib/
+config_dir  = /usr/local/foo/config/
+log_dir     = /usr/local/foo/log/
+
+and so on.  If we want to move the application we have to find and edit all the lines that depend
+on it.  So how would we solve this in the simplist way possible?  We could do something like this:
+
+install_dir = /usr/local/foo/
+lib_dir     = install_dir/lib/
+config_dir  = install_dir/config/
+log_dir     = install_dir/log/
+
+and so on, where every instance of install_dir after the first was replaced by its defined value.
+
+Now, this can only take us so far.
+
+At some point, we'll run into a situation that's a little more complicated; perhaps the 
+thing we want to spread around isn't known ahead of time but rather needs to be constructed
+of parts--parts that are themselves constructed out of parts, and so on.  If we're lucky, we'll
+know all the primative pieces before we need any of the first level agragate pieces, and we'll
+know all of those before we need any of the second level agregates, etc.
+
+If we're lucky.
+
+You know what they call people who depend on being lucky, don't you?
+
+Fortunately, we can handle this by simply making it a policy to not only expand things in 
+definitions to their defined values, but to also do it in the results of an expansion.  At
+the same time, we'll probably want to provide some way to protect a string from expansion,
+say by throwing quotes around it.  
+
+Another problem we're likely to encounter is where we have a bunch of stuff that's always the 
+same, something that's a little different every time, and then a whole bunch of stuff that's
+always the same.  We could deal with this by writing something like:
+
+virtual_host_preamble `choose_your_mate.com' virtual_host_body
+virtual_host_preamble `online_dating.org' virtual_host_body
+virtual_host_preamble `you_know_its_time.edu' virtual_host_body
+virtual_host_preamble `matchorama.com' virtual_host_body
+
+but we really want to write:
+
+virtual_host(`choose_your_mate.com')
+virtual_host(`online_dating.org')
+virtual_host(`you_know_its_time.edu')
+virtual_host(`matchorama.com')
+
+
+Yada yada through the other features (see http://mbreen.com/m4.html#toc4) ...
+
+...the easiest way to handle this is to just have one more "special" macro that 
+expands one of its arguments and then, based on the result, chooses one of its
+other arguments to expand into the final result.
+
+At this point, something wondeful has happened: we are done.  We can now proceed 
+to write our configuration files in the system, secure in the knowledge that we
+can handle anything that crops up.  Our configuration language is now turring 
+complete--it is powerful enough to let us work around any problem.  Need to do 
+something tricky?  No problem.  What about bugs in the application?  Presuming we
+have a very good understanding of what it's doing that's incorrect and what we'd 
+like it to do instead, we can, with sufficient cleverness, craft a configuration
+that gets the results we want.  Version incompatibilities?  Missing features?  
+Same deal.  We can handle anything upto and including the complete absence of the 
+application we're trying to configure.
+
+Now, it's worth noting at this point that no sane person would actually do 
+anything like this.  A configuration language this powerful would just lead
+to configuration files that were complex beyond comprehension.  And, in the
+world we visted, this is in fact what happened.
+
+But let's stay with it just a little while longer, and see how it plays out
+configuring some simple application like a e-mail forwarding agent.  Mail comes
+in, we look at the headers, figure out where it goes, and send it on its way.
+Pretty straightforward, really, unless you happen to choose the wrong hammer...
+
+
+
