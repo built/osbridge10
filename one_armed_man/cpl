@@ -225,7 +225,10 @@ problem = File.read(ARGV.first+'.cpl').
   gsub(/^ *state +([a-z_]+) +can +be +(([a-z_]+, *)*[a-z_]+ +or +[a-z_]+) *$/) { 
       " state :#{$1}, :#{$2.gsub(/(, *| +or +)/,',:')}"
   }.
-  gsub(/^ *state +([a-z_]+) *$/,' state :\1')
+  gsub(/^ *state +([a-z_]+) *$/,' state :\1').
+  gsub(/that +([A-Z][a-z]*) +([a-z_]+) +be +([a-z_0-9]+)/,'["\1",:\2,:\3]').
+  gsub(/that +([A-Z][a-z]*) +be +([a-z_]+) +([a-z_0-9]+)/,'["\1",:\2,:\3]').
+  gsub(/that +([A-Z][a-z]*) +be +([a-z_0-9]+) *([,\])]|$)/,'["\1",:location,:\2]\3')
 
 #print problem
 eval problem

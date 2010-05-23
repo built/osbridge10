@@ -34,13 +34,13 @@ A_bowl = something_with {
 
 Hand = A_hand.new('your hand',
     :transitions => ({
-        [:holding,:spoon, :nothing] => {:requires => [["Spoon", :location,:on_counter]]},
-        [:holding,:bowl,  :nothing] => {:requires => [["Bowl",  :location,:on_counter]]},
-        [:holding,:milk,  :nothing] => {:requires => [["Milk",  :location,:on_counter]]},
-        [:holding,:cereal,:nothing] => {:requires => [["Cereal",:location,:on_counter]]}
+        [:holding,:spoon, :nothing] => {:requires => [that Spoon location be on_counter]},
+        [:holding,:bowl,  :nothing] => {:requires => [that Bowl location be on_counter]},
+        [:holding,:milk,  :nothing] => {:requires => [that Milk location be on_counter]},
+        [:holding,:cereal,:nothing] => {:requires => [that Cereal location be on_counter]}
     }.merge(
         (os = [:spoon,:bowl,:milk,:cereal]).inject({}) { |h,o|
-            (os-[o]).inject(h) { |h,o2| h[[:holding,o,o2]] = {:requires => [["Hand",:holding,o2]]}; h }
+            (os-[o]).inject(h) { |h,o2| h[[:holding,o,o2]] = {:requires => [that Hand be holding o2]}; h }
         }
     ))
 )
@@ -51,14 +51,20 @@ Fridge   = A_fridge.new('the fridge',
     ],
     :transitions => {
         [:door,:open,:closed] => {:takes => 1.second},
-        [:door,:closed,:open] => {:takes => 1.second,:requires => [[Hand,:holding,:nothing]]}
+        [:door,:closed,:open] => {
+            :takes => 1.second,
+            :requires => [that Hand be holding nothing]
+        }
     }
 )
 Cupboard = A_cupboard.new('the cupboard', 
     :door => :closed,
     :transitions => {
         [:door,:open,:closed] => {:takes => 1.second},
-        [:door,:closed,:open] => {:takes => 1.second,:requires => [[Hand,:holding,:nothing]]}
+        [:door,:closed,:open] => {
+            :takes => 1.second,
+            :requires => [that Hand be holding nothing]
+        }
     }
 )
 Milk = A_milk_bottle.new('the milk',
@@ -67,24 +73,30 @@ Milk = A_milk_bottle.new('the milk',
         [:location,[:mid_air,:in_cupboard,:on_counter],0,1]
     ],
     :transitions => {
-        [:location,'*',:mid_air]   => {:requires => [[Hand,:holding,:milk]]},
-        [:location,'*',:in_fridge] => {:requires => [[Fridge,:door,:open],[Hand,:holding,:nothing]]},
-        [:location,:in_fridge,'*'] => {:requires => [[Fridge,:door,:open]]}
+        [:location,'*',:mid_air]   => {:requires => [that Hand be holding milk]},
+        [:location,'*',:in_fridge] => {:requires => [that Fridge door be open, that Hand be holding nothing]},
+        [:location,:in_fridge,'*'] => {:requires => [that Fridge door be open]}
     }
 )
 Cereal = A_cereal_box.new('the cereal',
     :location => :in_cupboard,
     :transitions => {
-        [:location,'*',:mid_air]     => {:requires => [[Hand,:holding,:cereal]]},
-        [:location,'*',:in_cupboard] => {:requires => [[Cupboard,:door,:open],[Hand,:holding,:nothing]]},
-        [:location,:in_cupboard,'*'] => {:requires => [[Cupboard,:door,:open]]}
+        [:location,'*',:mid_air]     => {:requires => [that Hand be holding cereal]},
+        [:location,'*',:in_cupboard] => {:requires => [that Cupboard door be open,that Hand be holding nothing]},
+        [:location,:in_cupboard,'*'] => {:requires => [that Cupboard door be open]}
     }
 )
 Spoon = A_spoon.new('the spoon',
     :location => :on_counter,
     :transitions => {
-        [:location,:on_counter,:in_cupboard] => {:takes => 1.second,:requires => [[Cupboard,:door,:open],[Hand,:holding,:nothing]]},
-        [:location,:in_cupboard,:on_counter] => {:takes => 1.second,:requires => [[Cupboard,:door,:open],[Hand,:holding,:nothing]]}
+        [:location,:on_counter,:in_cupboard] => {
+            :takes => 1.second,
+            :requires => [that Cupboard door be open, that Hand be holding nothing]
+        },
+        [:location,:in_cupboard,:on_counter] => {
+            :takes => 1.second,
+            :requires => [that Cupboard door be open,that Hand be holding nothing]
+        }
     }
 )
 
@@ -93,10 +105,20 @@ Bowl = A_bowl.new('the bowl',
     :contains_cereal => true,
     :contains_milk => true,
     :transitions => {
-        [:location,:on_counter,:in_cupboard] => {:takes => 1.second,:requires => [[Cupboard,:door,:open],[Hand,:holding,:nothing]]},
-        [:location,:in_cupboard,:on_counter] => {:takes => 1.second,:requires => [[Cupboard,:door,:open],[Hand,:holding,:nothing]]},
-        [:contains_milk,  false,true] => {:requires => [["Bowl",:location,:on_counter],[Milk,:location,:mid_air]]},
-        [:contains_cereal,false,true] => {:requires => [["Bowl",:location,:on_counter],[Cereal,:location,:mid_air]]}
+        [:location,:on_counter,:in_cupboard] => {
+            :takes => 1.second,
+            :requires => [that Cupboard door be open,that Hand be holding nothing]
+        },
+        [:location,:in_cupboard,:on_counter] => {
+            :takes => 1.second,
+            :requires => [that Cupboard door be open,that Hand be holding nothing]
+        },
+        [:contains_milk,  false,true] => {
+            :requires => [that Bowl location be on_counter, that Milk location be mid_air]
+        },
+        [:contains_cereal,false,true] => {
+            :requires => [that Bowl location be on_counter,that Cereal location be mid_air]
+        }
     }
 )
 
