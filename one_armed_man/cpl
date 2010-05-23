@@ -221,6 +221,7 @@ def something_with(&block)
     Resource_type.new(&block)
 end
 
-load ARGV.first+'.cpl'
+eval File.read(ARGV.first+'.cpl')
+
 make_it_so
 
