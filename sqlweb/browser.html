@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>untitled</title>
+	<title>SQL Power!</title>
 	<meta name="generator" content="TextMate http://macromates.com/">
 	<meta name="author" content="Matt Youell">
 
@@ -23,38 +23,58 @@
 	</style>
 	<script src="jquery-1.4.2.min.js"></script>
 	<script>
-	$(function() {
-	    var divs = $('div'); // Need to better understand how to iterate over these.
-	    divs.addClass("foo");
+	var SqlScript = function() {
+	    return $('script[language=SQL]').text().trim();
+    }
+
+	var SubmitForm = function() {
 	    
 	    $('input[type=text]').each( function(){
 	        console.log( $(this).attr("id") );
         });
 	    
-	    var sql = $('script[language=SQL]').text().trim();
+	    var sql = SqlScript();
 	    
 	    if( (/^select/i).test(sql) ) {
 	     
-	     console.log("that's a select statement.");
+	     console.log("SELECT found: " + sql);
 	     
-	     console.log("SQL: " + sql);
-	     
-	     matches = {}
-	     
-	     matches = sql.match(/^select (.*)/g);
-	     
-	     console.log("Matches: " + matches[0]);
-	     
+	     var matches = /^select\s+(.*)\s+from\s+(.*)\s+where\s+(.*);/g.exec(sql);
+
+         for(var i = 0; i < matches.length; i++)
+         {
+	         console.log("Match " + i + ": " + matches[i]);
+         }
+
+         var jqstr = "$('" + matches[2] + " input[" + matches[3] + "]')";
+
+         console.log(eval(jqstr).length + " items match the query.");
+
+         eval(jqstr).each(function() {
+             console.log($(this)[0].id + " = " + $(this)[0].value);
+         });
+
+
         }
         else {
             console.log("that's not a select statement?");
 	    }
 	    
+	    return false;
+
+    }
+
+	$(function() {
+	    var divs = $('div'); // Need to better understand how to iterate over these.
+	    divs.addClass("foo");
+	    
+	    $('#btn_submit').click(SubmitForm);
+	    
     });
 	</script>
 
 	<script language="SQL">
-	select id, value from #registration_form where input_type="text";
+	select id, value from #registration_form where type="text";
 	</script>
 </head>
 <body>

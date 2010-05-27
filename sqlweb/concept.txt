@@ -1,0 +1,39 @@
+In an alternate reality, SQL takes over. It is the dominant language for everything.
+
+What would a web app stack look like in that case?
+
+On the client side you would still have a static presentation layer (HTML), but you wouldn't use something like javascript to make pages dynamic. You'd just use SQL.
+
+Sending data over the wire, you wouldn't think of creating a special protocol, because you already have SQL.
+
+On the app server.. wait, why do you need an app server? Just use SQL in the database!
+
+My goal is to get people to actually start to believe that this is a good idea. Let them de-brainwash themselves later.
+
+Client Side:
+
+Let's have a standard HTML DOM be a given. Instead of Javascript, we're using SQL. People will know this because they'll see a script tag with language "SQL".
+
+Everything in the DOM will be selectable. Every container in the DOM will be considered to be a table with child elements that can be selected from.
+
+There will be an 'events' table which will contain the following columns:
+
+element_id  | event_type
+
+As an example, here is the event entry for a button that when clicked will submit a form:
+
+submit_1    | click
+
+add trigger foo
+    insert into server_stuff (select * from blah)
+    
+    
+Ultimately the goal is to create a CRUD app loop.
+
+
+
+
+
+
+
+
