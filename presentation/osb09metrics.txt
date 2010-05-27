@@ -1,0 +1,12 @@
+Slide metrics from last talk:
+
+Total slides: 69 (include title and fin)
+
+Total slides w/ code: 43  (18 in game + 25 elsewhere)
+
+slides with pictures or graphics: 9
+
+slides with photos: 5 (2 photos repeat, bookending presentation)
+
+
+
