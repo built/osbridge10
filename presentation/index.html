@@ -1,48 +1,28 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!-- saved from url=(0040)http://www.w3.org/Talks/Tools/Slidy/#(2) -->
-<HTML xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-US"><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<META name="generator" content="HTML Tidy for Linux/x86 (vers 1st November 2003), see www.w3.org">
-<TITLE>OSBRIDGE</TITLE>
-<META name="font-size-adjustment" content="-2">
-<LINK rel="stylesheet" href="./Slidy/slidy.css" type="text/css" media="screen, projection, print">
-<LINK rel="stylesheet" href="./Slidy/w3c-blue2.css" type="text/css" media="screen, projection, print">
-<LINK rel="stylesheet" href="./hammer.css" type="text/css" media="screen, projection, print">
-<SCRIPT src="./Slidy/slidy.js" charset="utf-8" type="text/javascript"></SCRIPT>
+<HTML xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-US">
+<HEAD>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <TITLE>OSBRIDGE</TITLE>
+        <META name="font-size-adjustment" content="-2">
+        <LINK rel="stylesheet" href="./Slidy/slidy.css" type="text/css" media="screen, projection, print">
+        <LINK rel="stylesheet" href="./hammer.css" type="text/css" media="screen, projection, print">
+        <SCRIPT src="./Slidy/slidy.js" charset="utf-8" type="text/javascript"></SCRIPT>
 </HEAD>
 <BODY style="font-size: 12pt; visibility: hidden; ">
-<DIV class=" toc" style="position: absolute; z-index: 300; width: 60%; max-width: 30em; height: 30em; overflow-x: auto; overflow-y: auto; top: auto; right: auto; left: 4em; bottom: 4em; padding-top: 1em; padding-right: 1em; padding-bottom: 1em; padding-left: 1em; background-image: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color: rgb(240, 240, 240); border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; font-size: 60%; visibility: hidden; display: none; background-position: initial initial; background-repeat: initial initial; ">
-    <DIV class=" toc-heading" style="text-align: center; width: 100%; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 1em; border-bottom-style: solid; border-bottom-color: rgb(180, 180, 180); border-bottom-width: 1px; ">Table of Contents</DIV>1. <A href="http://www.w3.org/Talks/Tools/Slidy/#(1)" class=" titleslide">HTML Slidy: Slide Shows in XHTML</A><BR>2. <A href="./Slidy/index_files/index.html">Slide Shows in XHTML</A><BR>3. <A href="http://www.w3.org/Talks/Tools/Slidy/#(3)">What you need to do</A><BR>4. <A href="http://www.w3.org/Talks/Tools/Slidy/#(4)">To get the W3C Blue Style</A><BR>5. <A href="http://www.w3.org/Talks/Tools/Slidy/#(5)">To use it off-line</A><BR>6. <A href="http://www.w3.org/Talks/Tools/Slidy/#(6)">Generate a Title Page</A><BR>7. <A href="http://www.w3.org/Talks/Tools/Slidy/#(7)">Incremental display of slide contents</A><BR>8. <A href="http://www.w3.org/Talks/Tools/Slidy/#(8)">Create outline lists with hidden content</A><BR>9. <A href="http://www.w3.org/Talks/Tools/Slidy/#(9)">Make your images scale with the browser window size</A><BR>10. <A href="http://www.w3.org/Talks/Tools/Slidy/#(10)">Incremental display of layered images</A><BR>11. <A href="http://www.w3.org/Talks/Tools/Slidy/#(11)">How to center content vertically and horizontally</A><BR>12. <A href="http://www.w3.org/Talks/Tools/Slidy/#(12)">Include SVG Content</A><BR>13. <A href="http://www.w3.org/Talks/Tools/Slidy/#(13)">Caveats with SVG+object</A><BR>14. <A href="http://www.w3.org/Talks/Tools/Slidy/#(14)">Additional Remarks</A><BR>15. <A href="http://www.w3.org/Talks/Tools/Slidy/#(15)">Localization and automatic translation</A><BR>16. <A href="http://www.w3.org/Talks/Tools/Slidy/#(16)">Future Plans</A><BR>17. <A href="http://www.w3.org/Talks/Tools/Slidy/#(17)">Acknowledgements</A><BR>18. <A href="http://www.w3.org/Talks/Tools/Slidy/#(18)">Acknowledgements</A></DIV>
-<DIV class="background" style="display: none; visibility: hidden; "><IMG alt="" id="head-icon" src="./Slidy/index_files/icon-blue.png"><OBJECT id="head-logo" data="http://www.w3.org/Talks/Tools/Slidy/w3c-logo-white.svg" type="image/svg+xml" title="W3C logo"><A href="http://www.w3.org/"><IMG alt="W3C logo" id="head-logo-fallback" src="./Slidy/index_files/w3c-logo-white.gif"></A></OBJECT></DIV>
 
-<DIV class="slide cover title" style="position: absolute; border-top-style: none; border-right-style: none; border-bottom-style: none; border-left-style: none; visibility: hidden; display: none; ">
-  <!-- hidden style graphics to ensure they are saved with other content -->
-  <IMG class="hidden" src="./Slidy/index_files/bullet.png" alt="">
-  <IMG class="hidden" src="./Slidy/index_files/fold.gif" alt="">
-  <IMG class="hidden" src="./Slidy/index_files/unfold.gif" alt="">
-  <IMG class="hidden" src="./Slidy/index_files/fold-dim.gif" alt="">
-  <IMG class="hidden" src="./Slidy/index_files/nofold-dim.gif" alt="">
-  <IMG class="hidden" src="./Slidy/index_files/unfold-dim.gif" alt="">
-  <IMG class="hidden" src="./Slidy/index_files/bullet-fold.gif" alt="">
-  <IMG class="hidden" src="./Slidy/index_files/bullet-unfold.gif" alt="">
-  <IMG class="hidden" src="./Slidy/index_files/bullet-fold-dim.gif" alt="">
-  <IMG class="hidden" src="./Slidy/index_files/bullet-nofold-dim.gif" alt="">
-  <IMG class="hidden" src="./Slidy/index_files/bullet-unfold-dim.gif" alt="">
-
+<DIV class="slide cover title hidden-without-border">
 <IMG src="./lib/img/zap.jpg" alt="Cover page images (keys)" class="cover"><BR clear="all">
 <h1>When Everything Looks Like a Nail</h1> 
 
 <P><A href="http://www.reality.com">Markus Roberts</A>, Puppet Labs, &lt;<A href="mailto:markus@reality.com">markus@reality.com</A>&gt;<BR>
-    <A href="http://youell.com">Matt Youell</A>, AboutUs.org &lt;<A href="mailto:markus@reality.com">matt@youell.com</A>&gt;<BR>
-<BR>
-<BR>
-<BR>
-<BR><BR></DIV>
+    <A href="http://youell.com">Matt Youell</A>, AboutUs.org &lt;<A href="mailto:markus@reality.com">matt@youell.com</A>&gt;<BR><BR><BR><BR><BR><BR>
+</P>
+</DIV>
 
 <DIV class="slide hammer">
 <H1>Welcome!</H1>
-<div class="hbox">
-Lorem Ipsum was here.
-</div>
+<div class="hbox">Lorem Ipsum was here.</div>
 </DIV>
 
 
@@ -59,7 +39,6 @@ Lorem Ipsum was here.
     </ul>
 </div>
 </DIV>
-
 
 
 <DIV class="slide hammer">
@@ -81,7 +60,6 @@ In which our fearless audience learns about constraints.
 <DIV class="slide hammer">
 <H1>One-Armed Man</H1>
 </DIV>
-
 
 
 
@@ -222,11 +200,9 @@ Touching, poetic conclusion :)
 instance:</P>
 
 <UL class="incremental">
-<LI style="visibility: hidden; ">First bullet point</LI>
-
-<LI style="visibility: hidden; ">Second bullet point</LI>
-
-<LI style="visibility: hidden; ">Third bullet point</LI>
+    <LI>First bullet point</LI>
+    <LI>Second bullet point</LI>
+    <LI>Third bullet point</LI>
 </UL>
 
 <P class="incremental" style="visibility: hidden; ">which is marked up as follows:</P>
