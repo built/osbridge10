@@ -15,11 +15,11 @@
     .foo {
         background-color: #eee;
     }
-    
+
     #txt_email, #txt_password {
-     width: 100%;   
+     width: 100%;
     }
-    
+
 	</style>
 	<script src="jquery-1.4.2.min.js"></script>
 	<script>
@@ -28,48 +28,53 @@
     }
 
 	var SubmitForm = function() {
-	    
-	    $('input[type=text]').each( function(){
-	        console.log( $(this).attr("id") );
-        });
-	    
+
 	    var sql = SqlScript();
-	    
+
 	    if( (/^select/i).test(sql) ) {
-	     
+
 	     console.log("SELECT found: " + sql);
-	     
+
 	     var matches = /^select\s+(.*)\s+from\s+(.*)\s+where\s+(.*);/g.exec(sql);
-
-         for(var i = 0; i < matches.length; i++)
-         {
-	         console.log("Match " + i + ": " + matches[i]);
-         }
-
+	     
+	     if(matches && matches.length > 2) {
+	     
          var jqstr = "$('" + matches[2] + " input[" + matches[3] + "]')";
 
          console.log(eval(jqstr).length + " items match the query.");
 
          eval(jqstr).each(function() {
              console.log($(this)[0].id + " = " + $(this)[0].value);
+             
+             var selector = '#' + $(this)[0].id.replace("txt_", "show_");
+
+             console.log( selector );
+             console.log($(selector));
+
+             console.log("Trying to replace this: " + $(selector)[0].innerHTML + " with this: " + "???");
+             // $('dd#' + $(this)[0].id.replace("txt_", "show_") ).innerText;
+
          });
 
+        }
+        else {
+            console.log("Huh? Match count: " + matches.length);
+        }
 
         }
         else {
             console.log("that's not a select statement?");
 	    }
-	    
+
 	    return false;
 
     }
 
 	$(function() {
-	    var divs = $('div'); // Need to better understand how to iterate over these.
+	    var divs = $('div');
 	    divs.addClass("foo");
-	    
+
 	    $('#btn_submit').click(SubmitForm);
-	    
     });
 	</script>
 
@@ -91,7 +96,7 @@
 <div id="box-C" class="box">
     C
 </div>
-    
+
 <div id="box-D" class="box">
     D
 </div>
@@ -123,12 +128,20 @@
         <td colspan="2"><input type="text" id="txt_password"></td>
     </tr>
     <tr>
-        <td align="right" colspan="2"><input type="submit" id="btn_submit"></td>
+        <td align="right" colspan="2"><input type="button" id="btn_submit" value="Submit"></td>
     </tr>
 </table>
 </form>
 
+<dl id="whatever" style="border: 1px red dashed">
+    <dt>Form info:</dt>
+    <dd id="show_name_first">x</dd>
+    <dd id="show_name_last">x</dd>
+    <dd id="show_email">x</dd>
+    <dd id="show_password">x</dd>
+</dl>
 
-    
+
+
 </body>
 </html>
