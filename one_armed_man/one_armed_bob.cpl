@@ -77,27 +77,27 @@ Milk = A_milk_bottle.new('the milk',
        when location is fridge then 0.0
        otherwise 2.0
     :transitions => {
-        [:location,'*',:mid_air]   => {requires [that Hand be holding milk]},
-        [:location,'*',:in_fridge] => {requires [that Fridge door be open, that Hand be holding nothing]},
-        [:location,:in_fridge,'*'] => {requires [that Fridge door be open]}
+        moving to mid_air     {requires [that Hand be holding milk]},
+        moving to in_fridge   {requires [that Fridge door be open, that Hand be holding nothing]},
+        moving from in_fridge {requires [that Fridge door be open]}
     }
 )
 Cereal = A_cereal_box.new('the cereal',
     should be in_cupboard
     :transitions => {
-        [:location,'*',:mid_air]     => {requires [that Hand be holding cereal]},
-        [:location,'*',:in_cupboard] => {requires [that Cupboard door be open,that Hand be holding nothing]},
-        [:location,:in_cupboard,'*'] => {requires [that Cupboard door be open]}
+        moving to mid_air       {requires [that Hand be holding cereal]},
+        moving to in_cupboard   {requires [that Cupboard door be open,that Hand be holding nothing]},
+        moving from in_cupboard {requires [that Cupboard door be open]}
     }
 )
 Spoon = A_spoon.new('the spoon',
     should be on_counter
     :transitions => {
-        [:location,:on_counter,:in_cupboard] => {
+        moving from on_counter to in_cupboard {
             takes 1 second,
             requires [that Cupboard door be open, that Hand be holding nothing]
         },
-        [:location,:in_cupboard,:on_counter] => {
+        moving from in_cupboard to on_counter {
             takes 1 second,
             requires [that Cupboard door be open,that Hand be holding nothing]
         }
@@ -116,11 +116,11 @@ Bowl = A_bowl.new('the bowl',
         when not contains_milk then 0.0
         otherwise 0.5
     :transitions => {
-        [:location,:on_counter,:in_cupboard] => {
+        moving from on_counter to in_cupboard {
             takes 1 second,
             requires [that Cupboard door be open,that Hand be holding nothing]
         },
-        [:location,:in_cupboard,:on_counter] => {
+        moving from in_cupboard to on_counter {
             takes 1 second,
             requires [that Cupboard door be open,that Hand be holding nothing]
         },

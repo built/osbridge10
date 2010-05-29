@@ -252,9 +252,12 @@ problem = File.read(ARGV.first+'.cpl').
   gsub(/^ +when +([a-z_]+) +then +(\d+\.?\d*) *$/,               '   when  obj[:\1,world]; \2'        ).
   gsub(/^ +when +not +([a-z_]+) +then +(\d+\.?\d*) *$/,          '   when !obj[:\1,world]; \2'        ).
   gsub(/^ +otherwise +(\d+\.?\d*) *$/,                           '   else \1; end},'                  ).
-  gsub(/^ +([a-z_]+) +should +be +([a-z_]+) *$/,                 '   :\1 => :\2,').
-  gsub(/^ +should +be +([a-z_]+) *$/,                            '   :location => :\1,').
-  gsub(/^ +should +([a-z_]+) *$/) { "  :#{$1.gsub(/^([a-z]+[^s])_/,'\1s_')} => true," }
+  gsub(/^ +([a-z_]+) +should +be +([a-z_]+) *$/,                 ' :\1 => :\2,').
+  gsub(/^ +should +be +([a-z_]+) *$/,                            ' :location => :\1,').
+  gsub(/^ +should +([a-z_]+) *$/)                              { " :#{$1.gsub(/^([a-z]+[^s])_/,'\1s_')} => true," }.
+  gsub(/^ +moving +from +([a-z_]+) +to +([a-z_]+)/,              ' [:location,:\1,:\2] => ').
+  gsub(/^ +moving +from +([a-z_]+)/,                             ' [:location,:\1,"*"] => ').
+  gsub(/^ +moving +to +([a-z_]+)/,                               ' [:location,"*",:\1] => ')
 
 #print problem
 eval problem
