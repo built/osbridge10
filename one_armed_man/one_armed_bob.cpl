@@ -49,7 +49,7 @@ Fridge   = A_fridge.new('the fridge',
     cost
         when door is open then 5
         otherwise 0.0
-    :transitions => {
+    transitions {
         going from door open to door closed {
             takes 1 second
         },
@@ -61,7 +61,7 @@ Fridge   = A_fridge.new('the fridge',
 )
 Cupboard = A_cupboard.new('the cupboard', 
     door should be closed
-    :transitions => {
+    transitions {
         going from door open to door closed {
             takes 1 second
         },
@@ -76,7 +76,7 @@ Milk = A_milk_bottle.new('the milk',
     cost 
        when location is fridge then 0.0
        otherwise 2.0
-    :transitions => {
+    transitions {
         moving to mid_air     {requires [that Hand be holding milk]},
         moving to in_fridge   {requires [that Fridge door be open, that Hand be holding nothing]},
         moving from in_fridge {requires [that Fridge door be open]}
@@ -84,7 +84,7 @@ Milk = A_milk_bottle.new('the milk',
 )
 Cereal = A_cereal_box.new('the cereal',
     should be in_cupboard
-    :transitions => {
+    transitions {
         moving to mid_air       {requires [that Hand be holding cereal]},
         moving to in_cupboard   {requires [that Cupboard door be open,that Hand be holding nothing]},
         moving from in_cupboard {requires [that Cupboard door be open]}
@@ -92,7 +92,7 @@ Cereal = A_cereal_box.new('the cereal',
 )
 Spoon = A_spoon.new('the spoon',
     should be on_counter
-    :transitions => {
+    transitions {
         moving from on_counter to in_cupboard {
             takes 1 second,
             requires [that Cupboard door be open, that Hand be holding nothing]
@@ -115,7 +115,7 @@ Bowl = A_bowl.new('the bowl',
         when contains_cereal then 0.0
         when not contains_milk then 0.0
         otherwise 0.5
-    :transitions => {
+    transitions {
         moving from on_counter to in_cupboard {
             takes 1 second,
             requires [that Cupboard door be open,that Hand be holding nothing]
