@@ -124,10 +124,10 @@ Bowl = A_bowl.new('the bowl',
             takes 1 second,
             requires [that Cupboard door be open,that Hand be holding nothing]
         },
-        [:contains_milk,  false,true] => {
+        going to contains_milk {
             requires [that Bowl be on_counter, that Milk be mid_air]
         },
-        [:contains_cereal,false,true] => {
+        going to contains_cereal {
             requires [that Bowl be on_counter,that Cereal be mid_air]
         }
     }
