@@ -23,57 +23,52 @@
 	</style>
 	<script src="jquery-1.4.2.min.js"></script>
 	<script>
-	var SqlScript = function() {
+	var SqlScript = function() 
+	{
 	    return $('script[language=SQL]').text().trim();
     }
+    
+    var select = function(sql)
+    {
+        console.log("select: sql: " + sql);
+        
+        if( ! (/^select/i).test(sql) ) 
+        {
+            console.log("test fails on that sql.");
+            return null;
+        }
+        return /^select\s+(.*)\s+from\s+(.*)\s+where\s+(.*);/.exec(sql);
+    }
+    
+	var SubmitForm = function() 
+	{
+        console.log("sql: " + SqlScript());
+     
+        var matches = select(SqlScript());
+        
+        if(matches && matches.length > 2) 
+        {
+            var jqstr = "$('" + matches[2] + " input[" + matches[3] + "]')";
 
-	var SubmitForm = function() {
-
-	    var sql = SqlScript();
-
-	    if( (/^select/i).test(sql) ) {
-
-	     console.log("SELECT found: " + sql);
-
-	     var matches = /^select\s+(.*)\s+from\s+(.*)\s+where\s+(.*);/g.exec(sql);
-	     
-	     if(matches && matches.length > 2) {
-	     
-         var jqstr = "$('" + matches[2] + " input[" + matches[3] + "]')";
-
-         console.log(eval(jqstr).length + " items match the query.");
-
-         eval(jqstr).each(function() {
-             console.log($(this)[0].id + " = " + $(this)[0].value);
-             
-             var selector = '#' + $(this)[0].id.replace("txt_", "show_");
-
-             console.log( selector );
-             console.log($(selector));
-
-             console.log("Trying to replace this: " + $(selector)[0].innerHTML + " with this: " + "???");
-             // $('dd#' + $(this)[0].id.replace("txt_", "show_") ).innerText;
-
-         });
+            console.log("jqstr: " + jqstr);
+            
+            eval(jqstr).each(function() 
+            {
+                var selector = 'dd#' + $(this)[0].id.replace("txt_", "show_");
+                $(selector)[0].innerText = $(this)[0].value;
+            });
 
         }
-        else {
-            console.log("Huh? Match count: " + matches.length);
+        else 
+        {
+            console.log("There may be a problem with your SQL. No matches?");
         }
-
-        }
-        else {
-            console.log("that's not a select statement?");
-	    }
 
 	    return false;
-
     }
 
+    // When Document is ready...
 	$(function() {
-	    var divs = $('div');
-	    divs.addClass("foo");
-
 	    $('#btn_submit').click(SubmitForm);
     });
 	</script>
@@ -83,27 +78,6 @@
 	</script>
 </head>
 <body>
-
-<div id="box-A" class="box">
-    A
-    <h5>foo</h5>
-</div>
-
-<div id="box-B" class="box">
-    B
-</div>
-
-<div id="box-C" class="box">
-    C
-</div>
-
-<div id="box-D" class="box">
-    D
-</div>
-
-<div id="box-E" class="box">
-    E
-</div>
 
 <form id="registration_form">
 <table style="border: 1px dashed #ccc">
@@ -134,7 +108,7 @@
 </form>
 
 <dl id="whatever" style="border: 1px red dashed">
-    <dt>Form info:</dt>
+    <dt>Ready to submit the following:</dt>
     <dd id="show_name_first">x</dd>
     <dd id="show_name_last">x</dd>
     <dd id="show_email">x</dd>
