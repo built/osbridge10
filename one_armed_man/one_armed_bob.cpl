@@ -34,10 +34,10 @@ A_bowl = something_with {
 
 Hand = A_hand.new('your hand',
     :transitions => ({
-        [:holding,:spoon, :nothing] => {requires [that Spoon be on_counter]},
-        [:holding,:bowl,  :nothing] => {requires [that Bowl be on_counter]},
-        [:holding,:milk,  :nothing] => {requires [that Milk be on_counter]},
-        [:holding,:cereal,:nothing] => {requires [that Cereal be on_counter]}
+        going from holding spoon  to holding nothing {requires [that Spoon be on_counter]},
+        going from holding bowl   to holding nothing {requires [that Bowl be on_counter]},
+        going from holding milk   to holding nothing {requires [that Milk be on_counter]},
+        going from holding cereal to holding nothing {requires [that Cereal be on_counter]}
     }.merge(
         (os = [:spoon,:bowl,:milk,:cereal]).inject({}) { |h,o|
             (os-[o]).inject(h) { |h,o2| h[[:holding,o,o2]] = {requires [["Hand",:holding,o2]]}; h }
@@ -50,10 +50,10 @@ Fridge   = A_fridge.new('the fridge',
         when door is open then 5
         otherwise 0.0
     :transitions => {
-        [:door,:open,:closed] => {
+        going from door open to door closed {
             takes 1 second
         },
-        [:door,:closed,:open] => {
+        going from door closed to door open {
             takes 1 second,
             requires [that Hand be holding nothing]
         }
@@ -62,10 +62,10 @@ Fridge   = A_fridge.new('the fridge',
 Cupboard = A_cupboard.new('the cupboard', 
     door should be closed
     :transitions => {
-        [:door,:open,:closed] => {
+        going from door open to door closed {
             takes 1 second
         },
-        [:door,:closed,:open] => {
+        going from door closed to door open {
             takes 1 second,
             requires [that Hand be holding nothing]
         }

@@ -257,7 +257,8 @@ problem = File.read(ARGV.first+'.cpl').
   gsub(/^ +should +([a-z_]+) *$/)                              { " :#{$1.gsub(/^([a-z]+[^s])_/,'\1s_')} => true," }.
   gsub(/^ +moving +from +([a-z_]+) +to +([a-z_]+)/,              ' [:location,:\1,:\2] => ').
   gsub(/^ +moving +from +([a-z_]+)/,                             ' [:location,:\1,"*"] => ').
-  gsub(/^ +moving +to +([a-z_]+)/,                               ' [:location,"*",:\1] => ')
+  gsub(/^ +moving +to +([a-z_]+)/,                               ' [:location,"*",:\1] => ').
+  gsub(/^ +going +from +([a-z_]+) +([a-z_]+) +to +\1 +([a-z_]+)/,' [:\1,:\2,:\3] => ')
 
 #print problem
 eval problem
