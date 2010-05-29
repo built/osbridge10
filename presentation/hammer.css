@@ -376,7 +376,7 @@ ul li {
   list-style: none;
   margin: 0.1em 0em 0.6em 0;
   padding: 0 0 0 40px;
-  background: transparent url(bullet.png) no-repeat 5px 0.3em;
+  background: transparent url(./Slidy/index_files/bullet.png) no-repeat 5px 0.3em;
   line-height: 140%;
 }
 
@@ -437,7 +437,7 @@ ol.outline li.unfolded {
 }
 ol.outline li.folded {
   padding: 0 0 0 20px;
-  background: transparent url(unfold-dim.gif) no-repeat 0px 0.3em;
+  background: transparent url(./Slidy/index_files/unfold-dim.gif) no-repeat 0px 0.3em;
 }
 ol.outline li.unfolded:hover {
   padding: 0 0 0 20px;
@@ -458,7 +458,7 @@ ul.outline li.unfolded {
 }
 ul.outline li.folded {
   padding: 0 0 0 52px;
-  background: transparent url(bullet-unfold-dim.gif) no-repeat 5px 0.3em;
+  background: transparent url(./Slidy/index_files/bullet-unfold-dim.gif) no-repeat 5px 0.3em;
 }
 ul.outline li.unfolded:hover {
   padding: 0 0 0 52px;
@@ -479,7 +479,7 @@ li ul.outline li.unfolded {
 }
 li ul.outline li.folded {
   padding: 0 0 0 21px;
-  background: transparent url(unfold-dim.gif) no-repeat 5px 0.3em;
+  background: transparent url(./Slidy/index_files/unfold-dim.gif) no-repeat 5px 0.3em;
 }
 li ul.outline li.unfolded:hover {
   padding: 0 0 0 21px;
