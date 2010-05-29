@@ -95,7 +95,7 @@ end
 #
 # States are represented as arrays of values for all the properties of interest
 #     Ordered according to the state_dimensions list in $sd
-#   
+# 
 def neighbors(s)
     result = []
     $sd.each_with_index { |rp,i|
@@ -251,7 +251,10 @@ problem = File.read(ARGV.first+'.cpl').
   gsub(/^ +when +([a-z_]+) +is +([a-z_]+) +then +(\d+\.?\d*) *$/,'   when  obj[:\1,world] == :\2; \3'  ).
   gsub(/^ +when +([a-z_]+) +then +(\d+\.?\d*) *$/,               '   when  obj[:\1,world]; \2'        ).
   gsub(/^ +when +not +([a-z_]+) +then +(\d+\.?\d*) *$/,          '   when !obj[:\1,world]; \2'        ).
-  gsub(/^ +otherwise +(\d+\.?\d*) *$/,                           '   else \1; end},'                  )
+  gsub(/^ +otherwise +(\d+\.?\d*) *$/,                           '   else \1; end},'                  ).
+  gsub(/^ +([a-z_]+) +should +be +([a-z_]+) *$/,                 '   :\1 => :\2,').
+  gsub(/^ +should +be +([a-z_]+) *$/,                            '   :location => :\1,').
+  gsub(/^ +should +([a-z_]+) *$/) { "  :#{$1.gsub(/^([a-z]+[^s])_/,'\1s_')} => true," }
 
 #print problem
 eval problem

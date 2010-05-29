@@ -45,7 +45,7 @@ Hand = A_hand.new('your hand',
     ))
 )
 Fridge   = A_fridge.new('the fridge', 
-    :door => :closed,
+    door should be closed
     cost
         when door is open then 5
         otherwise 0.0
@@ -60,7 +60,7 @@ Fridge   = A_fridge.new('the fridge',
     }
 )
 Cupboard = A_cupboard.new('the cupboard', 
-    :door => :closed,
+    door should be closed
     :transitions => {
         [:door,:open,:closed] => {
             takes 1 second
@@ -72,7 +72,7 @@ Cupboard = A_cupboard.new('the cupboard',
     }
 )
 Milk = A_milk_bottle.new('the milk',
-    :location => :in_fridge,
+    should be in_fridge
     cost 
        when location is fridge then 0.0
        otherwise 2.0
@@ -83,7 +83,7 @@ Milk = A_milk_bottle.new('the milk',
     }
 )
 Cereal = A_cereal_box.new('the cereal',
-    :location => :in_cupboard,
+    should be in_cupboard
     :transitions => {
         [:location,'*',:mid_air]     => {requires [that Hand be holding cereal]},
         [:location,'*',:in_cupboard] => {requires [that Cupboard door be open,that Hand be holding nothing]},
@@ -91,7 +91,7 @@ Cereal = A_cereal_box.new('the cereal',
     }
 )
 Spoon = A_spoon.new('the spoon',
-    :location => :on_counter,
+    should be on_counter
     :transitions => {
         [:location,:on_counter,:in_cupboard] => {
             takes 1 second,
@@ -105,9 +105,9 @@ Spoon = A_spoon.new('the spoon',
 )
 
 Bowl = A_bowl.new('the bowl',
-    :location => :on_counter,
-    :contains_cereal => true,
-    :contains_milk => true,
+    should be on_counter
+    should contain_cereal
+    should contains_milk
     cost
         # we have a mild disinclination to add the milk
         # before the cereal, because it's more likely to
