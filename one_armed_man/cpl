@@ -37,9 +37,9 @@ class A_resource
             p,*vv = *pvv
             v1s,v2s = *vv.collect { |v|
                 case v
-                  when '*';   type.states[p]
-                  when Array; v
-                  else        [v]
+                  when '*',:_; type.states[p]
+                  when Array;  v
+                  else         [v]
                   end
             }
             v1s.each { |v1| v2s.each { |v2|
@@ -162,10 +162,10 @@ def make_it_so
                 #puts "May need to take #{p} of #{r} from #{v1} to #{v2}"
                 ((r.transitions[[p,v1,v2]]||{})[:requires] || []).each { |rd,pd,vd,nix|
                     substates_of_interest[[rd,pd]] |= [rd[pd]]
-                    to_add = (nix ? (rd.type.states[pd] - [vd]) : [vd]) - substates_of_interest[[rd,pd]]
+                    to_add = (nix ? (rd.type.states[pd] - [vd]) : [vd]).flatten - substates_of_interest[[rd,pd]]
                     unless to_add.empty?
                         done = false
-                        #puts "Adding #{rd}.#{pd} : #{to_add.join(', ')}"
+                        #puts "Adding #{rd}.#{pd} : #{to_add.join(', ')}" if rd.to_s == 'your hand'
                         substates_of_interest[[rd,pd]] |= to_add
                     end
                 }
@@ -203,7 +203,7 @@ def make_it_so
         #
         next if reachable_states.include? x
 
-        #puts op.join(':')
+        #puts "#{printable_state(x)} \n: #{op.join(':')}" if op.first.to_s == "your hand"
         reachable_states[x] = [c,b,op]
         break if (0...(state_dimensions.length)).all? { |i| !goal[i] or x[i] == goal[i] }
         front += neighbors(x).

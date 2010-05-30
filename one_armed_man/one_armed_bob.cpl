@@ -31,16 +31,16 @@ A_bowl = something_with {
     state contains_milk
 }
 
-
 Hand = A_hand.new('your hand',
-    :transitions => ({
+    transitions {
         going to holding nothing {requires [that old_object not be mid_air]},
-    }.merge(
-        (os = [:spoon,:bowl,:milk,:cereal]).inject({}) { |h,o|
-            (os-[o]).inject(h) { |h,o2| h[[:holding,o,o2]] = {requires [["Hand",:holding,o2]]}; h }
-        }
-    ))
+        going to holding milk    {requires [that Hand be holding nothing]},
+        going to holding bowl    {requires [that Hand be holding nothing]},
+        going to holding spoon   {requires [that Hand be holding nothing]},
+        going to holding cereal  {requires [that Hand be holding nothing]},
+    }
 )
+
 Fridge   = A_fridge.new('the fridge', 
     door should be closed
     cost
@@ -56,6 +56,7 @@ Fridge   = A_fridge.new('the fridge',
         }
     }
 )
+
 Cupboard = A_cupboard.new('the cupboard', 
     door should be closed
     transitions {
@@ -79,6 +80,7 @@ Milk = A_milk_bottle.new('the milk',
         moving from in_fridge {requires [that Fridge door be open]}
     }
 )
+
 Cereal = A_cereal_box.new('the cereal',
     should be in_cupboard
     transitions {
@@ -87,6 +89,7 @@ Cereal = A_cereal_box.new('the cereal',
         moving from in_cupboard {requires [that Cupboard door be open]}
     }
 )
+
 Spoon = A_spoon.new('the spoon',
     should be on_counter
     transitions {
