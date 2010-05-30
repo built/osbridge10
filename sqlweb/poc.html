@@ -2,6 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
     <head>
+        <script src="./lib/js/jquery-1.4.2.min.js" type="text/javascript"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>
             SQL Power!
@@ -22,8 +23,6 @@
         }
 
         </style>
-        <script src="jquery-1.4.2.min.js" type="text/javascript">
-</script>
         <script type="text/javascript">
 var SqlScript = function()
         {
@@ -66,48 +65,24 @@ var SqlScript = function()
         });
         </script>
         <script language="SQL">
-select id, value from #registration_form where type="text";
+        select id, value from #registration_form where type="text";
         </script>
     </head>
     <body>
         <form id="registration_form" name="registration_form">
             <table style="border: 1px dashed #ccc">
                 <tr>
-                    <td>
-                        First
-                    </td>
-                    <td>
-                        Last
-                    </td>
+                    <td>First</td>
+                    <td>Last</td>
                 </tr>
                 <tr>
-                    <td>
-                        <input type="text" id="txt_name_first">
-                    </td>
-                    <td>
-                        <input type="text" id="txt_name_last">
-                    </td>
+                    <td><input type="text" id="txt_name_first"></td>
+                    <td><input type="text" id="txt_name_last"></td>
                 </tr>
-                <tr>
-                    <td colspan="2">
-                        Email
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <input type="text" id="txt_email">
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        Password
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <input type="text" id="txt_password">
-                    </td>
-                </tr>
+                <tr><td colspan="2">Email</td></tr>
+                <tr><td colspan="2"><input type="text" id="txt_email"></td></tr>
+                <tr><td colspan="2">Password</td></tr>
+                <tr><td colspan="2"><input type="text" id="txt_password"></td></tr>
                 <tr>
                     <td align="right" colspan="2">
                         <input type="button" id="btn_submit" value="Submit">
@@ -116,21 +91,11 @@ select id, value from #registration_form where type="text";
             </table>
         </form>
         <dl id="whatever" style="border: 5px #eee solid; width: 400px; display: none;">
-            <dt>
-                Ready to submit the following:
-            </dt>
-            <dd id="show_name_first">
-                x
-            </dd>
-            <dd id="show_name_last">
-                x
-            </dd>
-            <dd id="show_email">
-                x
-            </dd>
-            <dd id="show_password">
-                x
-            </dd>
+            <dt>Ready to submit the following:</dt>
+            <dd id="show_name_first"></dd>
+            <dd id="show_name_last"></dd>
+            <dd id="show_email"></dd>
+            <dd id="show_password"></dd>
         </dl>
     </body>
 </html>
