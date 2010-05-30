@@ -34,10 +34,7 @@ A_bowl = something_with {
 
 Hand = A_hand.new('your hand',
     :transitions => ({
-        going from holding spoon  to holding nothing {requires [that Spoon be on_counter]},
-        going from holding bowl   to holding nothing {requires [that Bowl be on_counter]},
-        going from holding milk   to holding nothing {requires [that Milk be on_counter]},
-        going from holding cereal to holding nothing {requires [that Cereal be on_counter]}
+        going to holding nothing {requires [that old_object not be mid_air]},
     }.merge(
         (os = [:spoon,:bowl,:milk,:cereal]).inject({}) { |h,o|
             (os-[o]).inject(h) { |h,o2| h[[:holding,o,o2]] = {requires [["Hand",:holding,o2]]}; h }
