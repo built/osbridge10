@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>
+            SQL Power!
+        </title>
+        <link rel="stylesheet" type="text/css" href="./lib/style/demo.css" />
+        <script src="./lib/script/tools.sql"></script>
+        <script src="./lib/script/demo.sql"></script>
+        <script language="SQL">
+        select id, value from #registration_form where type="text";
+        insert into events "btn_submit", "click", "QUERY HERE"
+        </script>
+    </head>
+    <body>
+        <form id="registration_form" name="registration_form">
+            <table>
+                <tr>
+                    <td>First</td>
+                    <td>Last</td>
+                </tr>
+                <tr>
+                    <td><input type="text" id="txt_name_first"></td>
+                    <td><input type="text" id="txt_name_last"></td>
+                </tr>
+                <tr><td colspan="2">Email</td></tr>
+                <tr><td colspan="2"><input type="text" id="txt_email"></td></tr>
+                <tr><td colspan="2">Password</td></tr>
+                <tr><td colspan="2"><input type="text" id="txt_password"></td></tr>
+                <tr>
+                    <td align="right" colspan="2">
+                        <input type="button" id="btn_submit" value="Submit">
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <dl id="whatever" style="border: 5px #eee solid; width: 400px; display: none;">
+            <dt>Ready to submit the following:</dt>
+            <dd id="show_name_first"></dd>
+            <dd id="show_name_last"></dd>
+            <dd id="show_email"></dd>
+            <dd id="show_password"></dd>
+        </dl>
+    </body>
+</html>
