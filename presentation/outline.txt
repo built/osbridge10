@@ -1,0 +1,103 @@
+I. Intro
+
+II. SQL portion of talk
+
+    A. Setup
+        The year is 2020.
+        In hindsight, it all seems so obvious.  After the Oracle / Goldman Sacks merger, the systematic elimination of the remaining pockets of the NoSQL movement were a foregone conclusion.  When ____ was put on the terrorist watch list, it pretty much signaled the end.  Their acquisition of Intel, AMD, and Zylog, followed by the announcement of the "SQL Machine" processors which used SQL as their assembly language quickly followed.
+
+        When the combined entity declared war on Nvidia Tyoto Sony Corp and the US and China got dragged into the fray the Code War had truly begun.  None of this is your problem.  Your job is just to write a graphics engine for the new Duke Nukem clone commissioned by the DoD.
+
+    B. SQL Web
+        1. A typical web stack
+        2. Web stack from the SQLverse
+            a. Client side scripting
+            b. The protocol
+            c. The server
+
+    C. SQL Graphics
+        1. pipeline
+        2. sets
+        3. code
+        4. image
+
+III. INTERLUDE - prep audience for constraint programming
+    A. Audience participation - EIEIEO
+
+IV. One Armed Man
+
+V. Pimp my editor (Math with ed)
+    A. Setup
+
+        Markus: For our next hammer, we chose emacs, one of the most amazing (blah blah blah)
+
+        Matt (puts up slide of “swiss army knife” with a jack hammer, chain saw, etc.)
+
+        Markus (blather about emacs)
+
+        Matt (pondering slide) (interrupts): I don't think that's a hammer.
+
+        Markus: huh?
+
+        Matt (to audience): What do you think?  Does that look like a hammer?
+
+        [CRAZY SWISS ARMY KNIFE]
+
+        Markus: Ok, VIM then.
+
+        [APARTMENT TOOL KIT]
+
+        (Matt follows same pattern w/ audience)
+
+        Markus: (exasperated) What should we use then?
+
+        Matt: ed
+
+        Markus: ed?
+
+        [BALLOON HAMMER]
+
+        Matt: Now *that's* a hammer.
+
+    B. Math with ed
+        1. Vim / Emacs wars left no survivors, ditto c / pascal and tastes great / less filling
+        2. semantics of ed; regex limited, g supresses errors
+        3. directory structure; code, data, assignment, loader
+        4. code
+        5. nails!
+
+
+VI. M4
+    A. In ed we were using regular expressions to implement macros?  Why not just use a macro processor?
+    B. Replacement engines are turing complete
+
+VII. INTERLUDE - prep for musical finale
+    A. Turing machine bit - see Turing spiel.
+
+VIII. Math with music
+    A. Harmonic computing
+    B. Alternate reality
+    C. Heterodyne
+    D. Jello (illo from SQL graphics again).
+
+IX. Conclusion / Theme examined
+
+    A. In the fib-ed example, we initially thought that everything “looked like text in a file” and, at some level, that was true.  But at another level—the level we were really working at—it was far from true.
+
+    B. Yes, our numeric variable files were just text in a buffer, but only in the sense that (insert dramatic jpg here) this image is “just a bunch of ones and zeros”
+
+    C. More pointedly, at some stage in the process we stopped looking at our files as text (even if they were) and started thinking of them as “code” and “data” with specific syntax and semantics, and concerning ourselves with with that level and ignoring their nail-ness.
+
+    D. Likewise with the sql image....
+
+    ...etc.
+
+    E. In hindsight, this should have been obvious.
+
+    F. At one point, “the only tool you have is a hammer” was literally true.
+        And the people who faced this situation used their hammers.... [SLIDE: Rock]
+        ...to make an axe: [SLIDE: Hands chipping]
+        ...and some arrows.  And awls.  And adzes.  And chisels.  And so on.  [SLIDE: Stone axe]
+        And thus, because people are never entirely satisfied with their tools, we embarked on a centuries-long process of tool building and tool improvement to this very day.  
+        When the only tool you have is a hammer, everything looks like raw materials to make better tools with.
+
