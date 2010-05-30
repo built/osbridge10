@@ -46,7 +46,7 @@ class A_resource
                 k = [p,v1,v2]
                 @transitions[k] ||= {}
                 @transitions[k][:requires] ||= []
-                @transitions[k][:requires] |= x[:requires] || []
+                @transitions[k][:requires] |= (x[:requires] || []).collect { |pvv| pvv.collect { |v| (v==:old) ? v1 : (v==:new) ? v2 : v}}
             }}
         }
         #puts "#{name} transitions:"
