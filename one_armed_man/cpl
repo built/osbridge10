@@ -46,7 +46,18 @@ class A_resource
                 k = [p,v1,v2]
                 @transitions[k] ||= {}
                 @transitions[k][:requires] ||= []
-                @transitions[k][:requires] |= (x[:requires] || []).collect { |pvv| pvv.collect { |v| (v==:old) ? v1 : (v==:new) ? v2 : v}}
+                @transitions[k][:requires] |= (x[:requires] || []).
+                    collect { |pvv| 
+                        pvv.collect { |v| 
+                            case v
+                            when :old; v1
+                            when :new; v2
+                            when :old_object; v1.to_s.capitalize
+                            when :new_object; v2.to_s.capitalize
+                            else v
+                            end
+                        }
+                    }
             }}
         }
         #puts "#{name} transitions:"
@@ -105,7 +116,7 @@ def neighbors(s)
         (vs-[s[i]]).each { |v|
             trans = r.transitions[[p,s[i],v]] || {}
             reqs = trans[:requires] || []
-            if reqs.all? { |rd,pd,vd| s[$sd.index([rd,pd]) || fail("#{rd}.#{pd} not in $sd")] == vd } 
+            if reqs.all? { |rd,pd,vd,nix| vx = s[$sd.index([rd,pd]) || fail("#{rd}.#{pd} not in $sd")]; nix ? (vx != vd) : (vx == vd) } 
                 s2 = s.dup
                 s2[i] = v
                 result << [s2,[r,p,v],trans[:takes] || 1.second]
@@ -131,7 +142,7 @@ def make_it_so
     Known_resources.each { |r|
          r.transitions.each { |rpvv,t|
              (t[:requires] || []).each { |rpv|
-                 rpv[0] = eval(rpv[0]) if rpv[0].is_a? String
+                 rpv[0] = eval(rpv[0]) rescue rpv[0].to_sym if rpv[0].is_a? String
              }
          }
          r.should.each { |p,v|
@@ -149,12 +160,13 @@ def make_it_so
             r,p = *rp
             vs.each { |v1| vs.each { |v2| if v1 != v2
                 #puts "May need to take #{p} of #{r} from #{v1} to #{v2}"
-                ((r.transitions[[p,v1,v2]]||{})[:requires] || []).each { |rd,pd,vd|
+                ((r.transitions[[p,v1,v2]]||{})[:requires] || []).each { |rd,pd,vd,nix|
                     substates_of_interest[[rd,pd]] |= [rd[pd]]
-                    unless substates_of_interest[[rd,pd]].include? vd
+                    to_add = (nix ? (rd.type.states[pd] - [vd]) : [vd]) - substates_of_interest[[rd,pd]]
+                    unless to_add.empty?
                         done = false
-                        #puts "Adding #{rd}.#{pd} : #{vd}"
-                        substates_of_interest[[rd,pd]] << vd
+                        #puts "Adding #{rd}.#{pd} : #{to_add.join(', ')}"
+                        substates_of_interest[[rd,pd]] |= to_add
                     end
                 }
             end } }
@@ -242,9 +254,16 @@ problem = File.read(ARGV.first+'.cpl').
       " state :#{$1}, :#{$2.gsub(/(, *| +or +)/,',:')}"
   }.
   gsub(/^ *state +([a-z_]+) *$/,' state :\1').
-  gsub(/that +([A-Z][a-z]*) +([a-z_]+) +be +([a-z_0-9]+)/,'["\1",:\2,:\3]').
-  gsub(/that +([A-Z][a-z]*) +be +([a-z_]+) +([a-z_0-9]+)/,'["\1",:\2,:\3]').
-  gsub(/that +([A-Z][a-z]*) +be +([a-z_0-9]+) *([,\])]|$)/,'["\1",:location,:\2]\3').
+  gsub(/that +([A-Z][a-z_]*) +([a-z_]+) +not +be +([a-z_0-9]+)/,'["\1",:\2,:\3,:not]').# that Foo door not be closed
+  gsub(/that +([A-Z][a-z_]*) +not +be +([a-z_0-9]+)/, '["\1",:location,:\2,:not]').    # that Foo not be here
+  gsub(/that +([A-Z][a-z_]*) +([a-z_]+) +be +([a-z_0-9]+)/,'["\1",:\2,:\3]').          # that Foo door be open
+  gsub(/that +([A-Z][a-z_]*) +be +([a-z_]+) +([a-z_0-9]+)/,'["\1",:\2,:\3]').          # that Foo be eating fruit
+  gsub(/that +([A-Z][a-z_]*) +be +([a-z_0-9]+) *([,\])]|$)/,'["\1",:location,:\2]\3'). # that Foo be on_mars
+  gsub(/that +([a-z_]*) +([a-z_]+) +not +be +([a-z_0-9]+)/,'[:\1,:\2,:\3,:not]').     # that foo door not be closed
+  gsub(/that +([a-z_]*) +not +be +([a-z_0-9]+)/,           '[:\1,:location,:\2,:not]').  # that foo not be here
+  gsub(/that +([a-z_]*) +([a-z_]+) +be +([a-z_0-9]+)/,     '[:\1,:\2,:\3]').          # that foo door be open
+  gsub(/that +([a-z_]*) +be +([a-z_]+) +([a-z_0-9]+)/,     '[:\1,:\2,:\3]').          # that foo be eating fruit
+  gsub(/that +([a-z_]*) +be +([a-z_0-9]+) *([,\])]|$)/,    '[:\1,:location,:\2]\3').  # that foo be on_mars
   gsub(/takes +(\d+\.?\d*) +seconds?/,':takes => \1.second').
   gsub(/requires +/,':requires => ').
   gsub(/^ *cost *$/,                                             ' :cost => lambda {|obj,world| case ').
@@ -259,6 +278,8 @@ problem = File.read(ARGV.first+'.cpl').
   gsub(/^ +moving +from +([a-z_]+)/,                             ' [:location,:\1,"*"] => ').
   gsub(/^ +moving +to +([a-z_]+)/,                               ' [:location,"*",:\1] => ').
   gsub(/^ +going +from +([a-z_]+) +([a-z_]+) +to +\1 +([a-z_]+)/,' [:\1,:\2,:\3] => ').
+  gsub(/^ +going +from +([a-z_]+) +([a-z_]+) +\{/,               ' [:\1,:\2,"*"] => {').
+  gsub(/^ +going +to +([a-z_]+) +([a-z_]+) +\{/,                 ' [:\1,"*",:\2] => {').
   gsub(/^ +going +to +([a-z_]+) +\{/,                            ' [:\1,false,true] => {').
   gsub(/^ +transitions +\{/,                                     ' :transitions => {')
 
