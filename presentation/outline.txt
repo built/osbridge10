@@ -8,14 +8,7 @@ II. SQL portion of talk
 
         When the combined entity declared war on Nvidia Tyoto Sony Corp and the US and China got dragged into the fray the Code War had truly begun.  None of this is your problem.  Your job is just to write a graphics engine for the new Duke Nukem clone commissioned by the DoD.
 
-    B. SQL Web
-        1. A typical web stack
-        2. Web stack from the SQLverse
-            a. Client side scripting
-            b. The protocol
-            c. The server
-
-    C. SQL Graphics
+    B. SQL Graphics
         1. pipeline
         2. sets
         3. code
