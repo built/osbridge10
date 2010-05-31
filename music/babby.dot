@@ -5,12 +5,7 @@ digraph HeterodyneAdder {
 
     subgraph cluster_inputs {
         rank=same;
-        node [shape=box];  a;b;ci;
-    }
-
-    subgraph cluster_chewed_inputs {
-        rank=same;
-        node [shape=circle fixedsize=true width=0.9];ai;av;bi;bv;
+        node [shape=box];  a;b;c;
     }
 
     {node [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
@@ -22,32 +17,43 @@ digraph HeterodyneAdder {
     ** Build the I-adder
     */
     subgraph cluster_add_Is {
-        e1 -> add01 -> add03 -> add05 -> sub01;
-        e3 -> sub01;
+        subgraph cluster_chewed_Is {
+            rank=same;
+            node [shape=circle fixedsize=true width=0.9]; ai;bi;ci;
+        }
+        {rank=same; e1 -> add01;}
+        ai -> add01 -> add03;
+                 bi -> add03 -> add05 -> sub01;
+                          ci -> add05;
+        {rank=same; e3 -> sub01;}
     }
     /*
     ** Feed the input into it
     */
+
     a->ai;
-    a->av;
-    ai->add01;
-    av->add02;
-    ci->add05;
+    b->bi;
+    c->ci;
+
     /*
     ** Build the V adder
     */
     subgraph cluster_add_Vs {
-        e2 -> add02 -> add04 -> add06 -> sub03;
-        e4 -> sub03;
+        subgraph cluster_chewed_Vs {
+            rank=same;
+            node [shape=circle fixedsize=true width=0.9]; av;bv;
+        }
+        {rank=same; e2 -> add02;}
+        av -> add02 -> add04 -> add06 -> sub03;
+                 bv -> add04;
+        {rank=same; e4 -> sub03;}
         sub02->add06;
     }
     /*
     ** Feed the inputs into it
     */
-    b->bi;
+    a->av;
     b->bv;
-    bi->add03;
-    bv->add04;
     /* Where does IIII come from? */
     IIII->sub02;
 
@@ -63,6 +69,7 @@ digraph HeterodyneAdder {
     */
     sub01->Ri;
     sub01->Rc;
+    sub03->Rv;
     Rc->sub02;
 
     overlap=false
