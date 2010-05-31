@@ -13,6 +13,7 @@ def graph(name,args={})
         set xzeroaxis lt -1
         set noxtics
         set noytics
+        set yrange [-1:1]
         #{lines.collect { |i|
             d = args[:data][i]
             "set style line #{i+2} lt rgb '#{d[1]||'black'}'  lw #{d[2]||1} # #{d.inspect}"
@@ -52,18 +53,34 @@ graph('sine_x1_heterodyne_sine_x2',
    :data => [
        ['sin(x)','grey',1],
        ['sin(1.7*x)','grey',1],
-       ['sin(x)+sin(1.7*x)',"black",1],
+       ['sin(x)+sin(1.7*x)',"purple",1],
        ['sin(x)+sin(1.7*x)+sin(x)*sin(1.7*x)',"black",3]
        ]
 )
 
 graph('sine_x1_heterodyne_sine_x2_decomposed', 
    :data => [
-       ['sin(x)','grey',1],
-       ['sin(1.7*x)','grey',1],
-       [' 0.5*cos(0.7*x)','blue',1],
-       ['-0.5*cos(2.7*x)','red',1],
+       ['sin(x)','grey20',1],
+       ['sin(1.7*x)','grey20',1],
+       [' 0.5*cos(0.7*x)','red',1],
+       ['-0.5*cos(2.7*x)','blue',1],
        ['sin(x)+sin(1.7*x)+sin(x)*sin(1.7*x)',"black",3],
+       ]
+)
+
+graph('heterodyne_sum', 
+   :data => [
+       ['sin(x)','grey20',1],
+       ['sin(1.7*x)','grey20',1],
+       ['cos(2.7*x)','blue',2],
+       ]
+)
+
+graph('heterodyne_diff', 
+   :data => [
+       ['sin(x)','grey20',1],
+       ['sin(1.7*x)','grey20',1],
+       ['cos(0.7*x)','red',2]
        ]
 )
 %q{
