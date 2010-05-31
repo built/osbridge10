@@ -1,0 +1,51 @@
+##Command to produce the output: "dot -Tpng thisfile > thisfile.png"
+
+digraph TrafficLights {
+node [shape=box];  a;b;
+node [shape=circle,fixedsize=true,width=0.9];ai;av;E;bi;bv;ci;
+"add01" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
+"add02" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
+"add03" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
+"add04" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
+"add05" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
+"add06" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
+"sub01" [shape=box,style=filled,fontcolor=white,fillcolor=gray,label="-",height=.3,width=.3];
+"sub02" [shape=box,style=filled,fontcolor=white,fillcolor=gray,label="-",height=.3,width=.3];
+"sub03" [shape=box,style=filled,fontcolor=white,fillcolor=gray,label="-",height=.3,width=.3];
+"sub04" [shape=box,style=filled,fontcolor=white,fillcolor=gray,label="-",height=.3,width=.3];
+
+
+E->add01;
+E->add02;
+
+a->ai;
+a->av;
+ai->add01;
+av->add02;
+add01->add03;
+add02->add04;
+
+b->bi;
+b->bv;
+bi->add03;
+bv->add04;
+add03->add05;
+add04->add06;
+
+ci->add05;
+
+E->sub01;
+add05->sub01;
+sub01->Ri;
+sub01->Rc;
+Rc->sub02;
+IIII->sub02;
+sub02->add06;
+add06->sub03;
+E->sub03;
+
+
+overlap=false
+label="Harmonic Math"
+fontsize=24;
+}
