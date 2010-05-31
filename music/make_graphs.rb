@@ -2,16 +2,19 @@ def graph(name,args={})
     args = {
         :range     => '[-2*pi:2*pi]',
         :yrange    => nil,
+        :height    => 200,
+        :width     => 300,
+        :xzero     => 'set xzeroaxis lt -1',
         :data      => [['cos(x)','black',1]]
     }.merge(args)
     lines = 0...(args[:data].length)
     File.open('temp.gnuplot','w') { |f| f.print %Q{
-        set terminal png transparent nocrop enhanced font courier size 300,200
+        set terminal png transparent nocrop enhanced font courier size #{args[:width]},#{args[:height]}
         set output '#{name}.png'
         #set key inside left vertical Right noreverse enhanced autotitles box linetype rgb "cyan" linewidth 1.000
         set nokey
         set noborder
-        set xzeroaxis lt -1
+        #{args[:xzero]}
         set noxtics
         set noytics
         #{"set yrange #{args[:yrange]}" if args[:yrange] }
@@ -25,6 +28,21 @@ def graph(name,args={})
     }}
     `/opt/local/bin/gnuplot temp.gnuplot`
 end
+
+graph('gear_like',
+  :range => '[0:10*pi]',
+  :data => [
+      ['sin(x*3)     ','grey90',8],
+      ['sin(x*3)+0.05','grey70',6],
+      ['sin(x*3)+0.15','grey50',4],
+      ['sin(x*3)+0.20','grey30',3],
+      ['sin(x*3)+0.25','grey10',2],
+      ['sin(x*3)+0.30','black', 1],
+  ],
+  :xzero => nil,
+  :width => 900,
+  :height => 100
+)
 
 graph('test',
   :range => '[0:3*pi]',
@@ -84,22 +102,4 @@ graph('heterodyne_diff',
        ['cos(0.7*x)','red',2]
        ]
 )
-%q{
 
-sin(f1) * sin(f2) = 1/2 ( cos(f1 + f2) - cos(f1-f2) )
-
------------
-
-sin(x) + sin(1.7x) = sin(1.7x) - sin(x) + sin(x)sin(1.7x)
-
-yielding:
-
--sin(x)
-sin(1.7x)
-cos(.7x)
-cos(2.7x)
-
------------
-
-
-}

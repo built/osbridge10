@@ -1,0 +1,11 @@
+ALL: If I had a hammer,
+A:     ...I'd hammer in a for loop,
+B:     ...I'd hammer in a while loop,
+C:     ...and I'd rather recurse
+ALL:
+    We'd hammer out good code
+    We'd hammer out bad code
+    We'd hammer out lots of code, 
+        but nothing near as weird as 
+        what you're going to seeeee...
+
