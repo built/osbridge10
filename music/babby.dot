@@ -1,51 +1,71 @@
 ##Command to produce the output: "dot -Tpng thisfile > thisfile.png"
 
-digraph TrafficLights {
-node [shape=box];  a;b;
-node [shape=circle,fixedsize=true,width=0.9];ai;av;E;bi;bv;ci;
-"add01" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
-"add02" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
-"add03" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
-"add04" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
-"add05" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
-"add06" [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
-"sub01" [shape=box,style=filled,fontcolor=white,fillcolor=gray,label="-",height=.3,width=.3];
-"sub02" [shape=box,style=filled,fontcolor=white,fillcolor=gray,label="-",height=.3,width=.3];
-"sub03" [shape=box,style=filled,fontcolor=white,fillcolor=gray,label="-",height=.3,width=.3];
-"sub04" [shape=box,style=filled,fontcolor=white,fillcolor=gray,label="-",height=.3,width=.3];
+digraph HeterodyneAdder {
+    graph [fontsize=15 splines=true overlap=false rankdir = "LR"];
 
+    subgraph cluster_inputs {
+        rank=same;
+        node [shape=box];  a;b;ci;
+    }
 
-E->add01;
-E->add02;
+    subgraph cluster_chewed_inputs {
+        rank=same;
+        node [shape=circle fixedsize=true width=0.9];ai;av;bi;bv;
+    }
 
-a->ai;
-a->av;
-ai->add01;
-av->add02;
-add01->add03;
-add02->add04;
+    {node [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
+        add01; add02; add03; add04; add05; add06;}
+    {node [shape=diamond,style=filled,fontcolor=white,fillcolor=red,label="-",height=.3,width=.3];
+        sub01; sub02; sub03; sub04;}
+    {node [shape=circle fixedsize=true width=0.9 labeli="e"];e1;e2;e3;e4;}
+    /*
+    ** Build the I-adder
+    */
+    subgraph cluster_add_Is {
+        e1 -> add01 -> add03 -> add05 -> sub01;
+        e3 -> sub01;
+    }
+    /*
+    ** Feed the input into it
+    */
+    a->ai;
+    a->av;
+    ai->add01;
+    av->add02;
+    ci->add05;
+    /*
+    ** Build the V adder
+    */
+    subgraph cluster_add_Vs {
+        e2 -> add02 -> add04 -> add06 -> sub03;
+        e4 -> sub03;
+        sub02->add06;
+    }
+    /*
+    ** Feed the inputs into it
+    */
+    b->bi;
+    b->bv;
+    bi->add03;
+    bv->add04;
+    /* Where does IIII come from? */
+    IIII->sub02;
 
-b->bi;
-b->bv;
-bi->add03;
-bv->add04;
-add03->add05;
-add04->add06;
+    /*
+    ** Group the output
+    */
+    subgraph cluster_results {
+        rank=same;
+        Ri; Rv; Rc;
+    }
+    /*
+    ** Extract the results into the output
+    */
+    sub01->Ri;
+    sub01->Rc;
+    Rc->sub02;
 
-ci->add05;
-
-E->sub01;
-add05->sub01;
-sub01->Ri;
-sub01->Rc;
-Rc->sub02;
-IIII->sub02;
-sub02->add06;
-add06->sub03;
-E->sub03;
-
-
-overlap=false
-label="Harmonic Math"
-fontsize=24;
+    overlap=false
+    label="Harmonic Math"
+    fontsize=24;
 }
