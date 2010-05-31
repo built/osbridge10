@@ -1,0 +1,27 @@
+digraph Spots_on_ray {
+    graph [fontsize=15 splines=true overlap=false rankdir = "RL"];
+    node [shape=box style=filled];
+    haze_f [label="haze\n(front)"     color=lightgrey];
+    haze_b [label="haze\n(back)"      color=lightgrey];
+    mount_f [label="mountain\n(front)" color=salmon2]; 
+    mount_b [label="mountain\n(back)"  color=salmon2]; 
+    backdrop [color=skyblue];
+
+    node [shape=circle label="" style=filled];
+    c0 [color=skyblue]; backdrop -> c0;
+    c1 [color=black]; mount_b -> c1;
+    c2 [color=salmon2]; mount_f -> c2;
+    c3 [color=salmon2]; haze_b -> c3;
+    c4 [color=salmon2]; haze_f -> c4;
+
+    { rank=same; c0; backdrop;}
+    { rank=same; c1; mount_b;}
+    { rank=same; c2; mount_f;}
+    { rank=same; c3; haze_b;}
+    { rank=same; c4; haze_f;}
+    subgraph cluster_ray {
+        haze_f -> haze_b -> mount_f -> mount_b -> backdrop;
+        label="";
+    }
+}
+

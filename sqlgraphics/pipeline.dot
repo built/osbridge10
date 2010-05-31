@@ -1,0 +1,16 @@
+digraph G {
+        graph [fontsize=15 splines=true overlap=false rankdir = "LR"]
+        subgraph cluster_input {
+                style=filled;
+                color=lightgrey;
+                node [style=filled,color=white];
+                objects;
+                view;
+                label = "scene\ndescription";
+        }
+
+        objects -> faces -> "translated\nfaces";
+        view -> "translated\nfaces" -> spots;
+        view -> rays -> spots -> "light\ntransformations" -> pixels;
+}
+
