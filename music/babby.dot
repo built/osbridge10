@@ -12,7 +12,7 @@ digraph HeterodyneAdder {
         add01; add02; add03; add04; add05; add06;}
     {node [shape=diamond,style=filled,fontcolor=white,fillcolor=red,label="-",height=.3,width=.3];
         sub01; sub02; sub03; sub04;}
-    {node [shape=circle fixedsize=true width=0.9 labeli="e"];e1;e2;e3;e4;}
+    {node [shape=circle fixedsize=true width=0.9 label="e"];e1;e2;e3;e4;}
     /*
     ** Build the I-adder
     */
