@@ -1,6 +1,7 @@
 def graph(name,args={})
     args = {
         :range     => '[-2*pi:2*pi]',
+        :yrange    => nil,
         :data      => [['cos(x)','black',1]]
     }.merge(args)
     lines = 0...(args[:data].length)
@@ -13,7 +14,7 @@ def graph(name,args={})
         set xzeroaxis lt -1
         set noxtics
         set noytics
-        set yrange [-1:1]
+        #{"set yrange #{args[:yrange]}" if args[:yrange] }
         #{lines.collect { |i|
             d = args[:data][i]
             "set style line #{i+2} lt rgb '#{d[1]||'black'}'  lw #{d[2]||1} # #{d.inspect}"
@@ -46,8 +47,8 @@ graph('sine_x1_plus_sine_x2',
 )
 
 graph('jello_in',            :data => [['-sin(2*x)']])
-graph('compresed_jello_out', :data => [['-0.8*sin(2*x)']])
-graph('stretched_jello_out', :data => [['-0.3*sin(2*x)']])
+graph('compresed_jello_out', :data => [['-0.8*sin(2*x)']],:yrange => '[-1:1]')
+graph('stretched_jello_out', :data => [['-0.3*sin(2*x)']],:yrange => '[-1:1]')
 
 graph('sine_x1_heterodyne_sine_x2', 
    :data => [
