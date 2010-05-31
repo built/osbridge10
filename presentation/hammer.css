@@ -142,7 +142,9 @@ div.slide {
   left: 0;
   right: 0;
   line-height: 120%;
-  background-color: transparent;
+  /* background-color: transparent; */
+  background-color: #B9C7E0; /* 1/2 saturation of theme colour */
+  /* background-color: #DCE4F0; */ /* 1/4 saturation of theme colour */
 }
 
 div.background {
@@ -244,7 +246,7 @@ div.slide h1 a:active {
   z-index: 2;
 }
 
-/* the next two classes support vertical and horizontal centering */
+/* the next three classes support vertical and horizontal centering */
 div.vbox {
   float: left;
   height: 40%;
@@ -258,12 +260,22 @@ div.hbox {
   margin-right:auto;
   height: 60%;
   border:1px solid silver;
-  background:#F0F0F0;
+  /* background:#F0F0F0; */
+  background:#E0E0E0;
   overflow:auto;
   text-align:left;
   clear:both;
 }
-
+div.stackbox {
+  margin-top: 0;
+  margin-left:auto;
+  margin-right:auto;
+  border:1px solid silver;
+  background:#E0E0E0;
+  overflow:auto;
+  text-align:left;
+  clear:both;
+}
 /* styling for named background */
 div.background.slanty {
   z-index: 2;
