@@ -238,12 +238,58 @@ In which our fearless audience learns about constraints.
 <DIV class="slide hammer">
 <H1>The plan of attack, management overview</H1>
 <ul>
-<li>Code is represented as text stored in text files
 <li>Data is represented as text stored in text files
+<li>Code is represented as text stored in text files
 </ul>
 </DIV>
 
+<DIV class="slide hammer">
+<H1>The plan of attack, gritty details</H1>
+<ul>
+<li>Data is represented as text stored in text files
+<ul>
+<li>Scalars can be represented by a line consisting of the natural string representation of the value
+<li>One dimensional arrays can be represented by multiline files with the first line containing the first element, the second line thesecond element, and so forth
+<li>Hashes can be represented by text files with an even number of lines, representing key-value pairs
+<li>Data structures can be nested by replacing all "\"s with "\\" and joining the lines with "\"-delemiters
+</ul>
+<li>Code is represented as text stored in text files
+<ul>
+<li>The main program will consist of commands which we'll pipe to ed
+<li>It can create variables by building text representing data in the buffer and writing it to temporary files with names like x.int or goo.array-of-float
+<li>It can create sub-routines by building text representing code in the buffer and writing it to temporary files with names like my-function.ed
+<li>It will need a way to produce lines consisting of a single "." in the output 
+</ul>
+</ul>
+</DIV>
 
+<DIV class="slide hammer">
+<H1>The pseudo code</H1>
+
+<pre>
+define sum(x+y=)
+    remove the last digits of x and y and add the corresponding number of "x"s to the front of the result
+    if there are ten or more "x"s, note a carry
+    replace the remaining "x"s with the corresponding digit
+    propogate carry
+    if there are still digits to process, recurse
+    exit
+        
+define next-fib
+    x:int = sum(fibs:array-of-int(last two))
+    fibs:array-of-int << x:int
+    end
+
+fibs:array-of-int = [1,1,2]
+
+repeatedly call next-fib
+
+</pre>
+</DIV>
+
+<DIV class="slide hammer">
+<H1>The real code...</H1>
+</DIV>
 
 <!--
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
