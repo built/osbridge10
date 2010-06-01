@@ -3,16 +3,16 @@ digraph Spots_on_ray {
     node [shape=box style=filled];
     haze_f [label="haze\n(front)"     color=lightgrey];
     haze_b [label="haze\n(back)"      color=lightgrey];
-    mount_f [label="mountain\n(front)" color=salmon2]; 
-    mount_b [label="mountain\n(back)"  color=salmon2]; 
+    mount_f [label="mountain\n(front)" color=salmon3]; 
+    mount_b [label="mountain\n(back)"  color=salmon3]; 
     backdrop [color=skyblue];
 
     node [shape=circle label="" style=filled];
     c0 [color=skyblue]; backdrop -> c0;
     c1 [color=black]; mount_b -> c1;
-    c2 [color=salmon2]; mount_f -> c2;
-    c3 [color=salmon2]; haze_b -> c3;
-    c4 [color=salmon2]; haze_f -> c4;
+    c2 [color=salmon3]; mount_f -> c2;
+    c3 [fillcolor=lightgrey color=salmon1 penwidth=5]; haze_b -> c3;
+    c4 [color="#ddb0a0"]; haze_f -> c4;
 
     { rank=same; c0; backdrop;}
     { rank=same; c1; mount_b;}
