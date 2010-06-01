@@ -350,21 +350,14 @@ From this sort of thing we could build up to integer math and...well, anything. 
 <DIV class="slide hammer">
 <H1>Taking it a step farther</H1>
 <div class="hbox">
-
-
-</div>
-</DIV>
-
-<DIV class="slide hammer">
-<H1>Taking it a step farther</H1>
-<div class="hbox">
+<p>In config files you often find things like:
 <pre>
 install_dir = /usr/local/foo/
 lib_dir     = /usr/local/foo/lib/
 config_dir  = /usr/local/foo/config/
 log_dir     = /usr/local/foo/log/
 </pre>
-
+<p>...where the semantic intent is more like:
 <pre>
 install_dir = /usr/local/foo/
 lib_dir     = install_dir/lib/
@@ -377,9 +370,81 @@ log_dir     = install_dir/log/
 <DIV class="slide hammer">
 <H1>Taking it a step farther</H1>
 <div class="hbox">
-
+<p>There are cases where we might write something like:
+<pre>
+virtual_host_preamble `choose_your_mate.com' virtual_host_body
+virtual_host_preamble `online_dating.org' virtual_host_body
+virtual_host_preamble `you_know_its_time.edu' virtual_host_body
+virtual_host_preamble `matchorama.com' virtual_host_body
+</pre>
+<p>but we really want to write something more like:
+<pre>
+virtual_host(`choose_your_mate.com')
+virtual_host(`online_dating.org')
+virtual_host(`you_know_its_time.edu')
+virtual_host(`matchorama.com')
+</pre>
 </div>
 </DIV>
+
+
+<DIV class="slide hammer">
+<H1>Taking it a step farther</H1>
+<div class="hbox">
+<p>There are of course a few low-hanging fruit "nice to have" features:
+<ul>
+<li>A (nestable) way to guard strings from replacement
+<li>A way to define new replacements as you go (getting rid of the outer recursion
+<li>A way to add comments (since these things could quickly get quite cryptic)
+<li>A way to do write conditionals
+</ul>
+<p>These are "nice to have" but not essential, as they could all be synthisized if they weren't provided.
+</div>
+</DIV>
+
+
+<DIV class="slide hammer">
+<H1>Taking it a step farther</H1>
+<div class="hbox" style="width:90%; height:80%">
+<pre>
+divert(0)
+ifdef(`_EDNSBL_R_',`dnl',`dnl
+VERSIONID(`$Id: enhdnsbl.m4,v 1.9 2002/05/19 21:27:29 gshapiro Exp $')
+LOCAL_CONFIG
+define(`_EDNSBL_R_',`')dnl
+# map for enhanced DNS based blacklist lookups
+Kednsbl dns -R A -a. -T<TMP> -r`'ifdef(`EDNSBL_TO',`EDNSBL_TO',`5')
+')
+divert(-1)
+define(`_EDNSBL_SRV_', `ifelse(len(X`'_ARG_),`1',`blackholes.mail-abuse.org',_ARG_)')dnl
+define(`_EDNSBL_MSG_', `ifelse(len(X`'_ARG2_),`1',`"550 Rejected: " $`'&{client_addr} " listed at '_EDNSBL_SRV_`"',`_ARG2_')')dnl
+define(`_EDNSBL_MSG_TMP_', `ifelse(_ARG3_,`t',`"451 Temporary lookup failure of " $`'&{client_addr} " at '_EDNSBL_SRV_`"',`_ARG3_')')dnl
+define(`_EDNSBL_MATCH_', `ifelse(len(X`'_ARG4_),`1',`$`'+',_ARG4_)')dnl
+divert(8)
+# DNS based IP address spam list _EDNSBL_SRV_
+R$*                     $: $&{client_addr}
+R$-.$-.$-.$-            $: <?> $(ednsbl $4.$3.$2.$1._EDNSBL_SRV_. $: OK $)
+R<?>OK                  $: OKSOFAR
+ifelse(len(X`'_ARG3_),`1',
+`R<?>$+<TMP>            $: TMPOK',
+`R<?>$+<TMP>            $#error $@ 4.7.1 $: _EDNSBL_MSG_TMP_')
+R<?>_EDNSBL_MATCH_      $#error $@ 5.7.1 $: _EDNSBL_MSG_
+ifelse(len(X`'_ARG5_),`1',`dnl',
+`R<?>_ARG5_     $#error $@ 5.7.1 $: _EDNSBL_MSG_')
+ifelse(len(X`'_ARG6_),`1',`dnl',
+`R<?>_ARG6_     $#error $@ 5.7.1 $: _EDNSBL_MSG_')
+ifelse(len(X`'_ARG7_),`1',`dnl',
+`R<?>_ARG7_     $#error $@ 5.7.1 $: _EDNSBL_MSG_')
+ifelse(len(X`'_ARG8_),`1',`dnl',
+`R<?>_ARG8_     $#error $@ 5.7.1 $: _EDNSBL_MSG_')
+ifelse(len(X`'_ARG9_),`1',`dnl',
+`R<?>_ARG9_     $#error $@ 5.7.1 $: _EDNSBL_MSG_')
+divert(-1)
+</pre>
+</div>
+</DIV>
+
+
 <!--
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  END M4
