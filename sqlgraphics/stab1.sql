@@ -135,7 +135,7 @@ insert into face
             the_vector(-300.0, 300.0, 282.0) as p2,
             the_vector(-100.0, 500.0, 282.0) as p3,
             the_vector( 100.0, 300.0, 282.0) as p4
-          ) jello_faces;
+          ) cube_faces;
 */
 insert into face
     select
@@ -153,7 +153,7 @@ insert into face
             the_vector(-100.0, 100.0,   0.0) as p2,
             the_vector(-100.0, 100.0, 282.0) as p3,
             the_vector( 100.0, 300.0, 282.0) as p4
-          ) jello_faces;
+          ) cube_faces;
 
 
 insert into face
@@ -172,7 +172,7 @@ insert into face
             the_vector(-300.0, 300.0,   0.0) as p2,
             the_vector(-300.0, 300.0, 282.0) as p3,
             the_vector(-100.0, 100.0, 282.0) as p4
-          ) jello_faces;
+          ) cube_faces;
 
 
 insert into face
@@ -191,7 +191,7 @@ insert into face
             the_vector(-300.0, 300.0, 282.0) as p2,
             the_vector(-100.0, 500.0, 282.0) as p3,
             the_vector( 100.0, 300.0, 282.0) as p4
-          ) jello_faces;
+          ) cube_faces;
 
 
 
