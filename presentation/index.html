@@ -110,11 +110,13 @@ INSERT INTO register (AX) VALUE (5);
 <div style="width: 80%; margin-left: 10%">
 Compare this:
 <pre class="simple-code">
-GET /index.html HTML/1.0
+GET /index.html HTML/1.1
+Host: www.example.com
+
 </pre>
 with this:
 <pre class="simple-code">
-SELECT * FROM hostname:webpages WHERE FILENAME="index.html";
+SELECT * FROM www.example.com:webpages WHERE FILENAME="index.html";
 </pre>
 </div>
 
