@@ -67,7 +67,7 @@ other arguments to expand into the final result.
 
 At this point, something wondeful has happened: we are done.  We can now proceed 
 to write our configuration files in the system, secure in the knowledge that we
-can handle anything that crops up.  Our configuration language is now turring 
+can handle anything that crops up.  Our configuration language is now Turing 
 complete--it is powerful enough to let us work around any problem.  Need to do 
 something tricky?  No problem.  What about bugs in the application?  Presuming we
 have a very good understanding of what it's doing that's incorrect and what we'd 
