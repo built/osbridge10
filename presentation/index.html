@@ -753,7 +753,7 @@ divert(-1)
 </DIV>
 
 <DIV class="slide hammer">
-<H1>What does this have to do with music?</H1>
+<H1>So what could we do with this?</H1>
 <center>
     <img src="./lib/img/cc/2815838055_75f457f8dc.jpg"/>
 </center>
@@ -798,31 +798,80 @@ divert(-1)
 </DIV>
 
 <DIV class="slide hammer">
+<H1>Nieve Frequency / Value Mapping</H1>
+<center>
+<div>
+<img src="./lib/img/pd/scales_and_keyboard.png"><br>
+<div style="width: 50%; margin: 5px">
+    <table border="1" style="background-color: #eee;float: left;">
+        <tr><td>    Value    </td><td>   Key     </td> </tr>
+        <tr><td>    1    </td><td>   c<sup>0</sup> </td>
+        <tr><td>    2    </td><td>   c<sup>2</sup> </td>
+        <tr><td>    3    </td><td>   c<sup>3</sup> </td>
+        <tr><td>    4    </td><td>   g<sup>3</sup> </td>
+        <tr><td>    5    </td><td>   c<sup>4</sup> </td>
+        <tr><td>    6    </td><td>   e<sup>4</sup> </td>
+        <tr><td>    7    </td><td>   g<sup>4</sup> </td>
+        <tr><td>    8    </td><td>   a<sup>4</sup> </td>
+        <tr><td>    9    </td><td>   b&#9837;<sup>4</sup> </td>
+    </table>
+</div>
+</DIV>
+
+<DIV class="slide hammer">
+<H1>Better Frequency / Value Mapping</H1>
+<center>
+<div>
+<img src="./lib/img/pd/scales_and_keyboard.png"><br>
+<div style="width: 50%; margin: 5px">
+    <table border="1" style="background-color: #eee;float: left;">
+        <tr><td>    Value    </td><td>   Key     </td> </tr>
+        <tr><td>    1 (I)    </td><td>   c<sup>1</sup> </td>
+        <tr><td>    2 (II)   </td><td>   c<sup>2</sup> </td>
+        <tr><td>    3 (III)  </td><td>   g<sup>2</sup> </td>
+        <tr><td>    4 (IIII) </td><td>   c<sup>3</sup> </td>
+        <tr><td>    5 (V)    </td><td>   e<sup>1</sup> </td>
+    </table>
+</div>
+</DIV>
+
+<DIV class="slide hammer">
+<H1>Heterodyning</H1>
+<div class="hbox" style="width:75%; height:80%">
+    <img src="../music/babby.png" style="width:100%; height:100%" />
+</div>
+</DIV>
+
+
+<DIV class="slide hammer">
 <H1>Keyboard Value Mapping</H1>
 <center>
 <div>
 <img src="./lib/img/pd/scales_and_keyboard.png"><br>
 <div style="width: 50%; margin: 5px">
     <table border="1" style="background-color: #eee;float: left;">
-        <tr><td>    Value   </td><td>   Key     </td></tr>
-        <tr><td>    0       </td><td>   G<sub>1</sub> </td>
-        <tr><td>    1       </td><td>   C<sub>4</sub> </td>
-        <tr><td>    2       </td><td>   C<sub>5</sub> </td>
-        <tr><td>    3       </td><td>   G<sub>5</sub> </td>
-        <tr><td>    4       </td><td>   ??<sub>??</sub> </td>
-        <tr><td>    5       </td><td>   C<sub>5</sub> + G<sub>5</sub> </td>
-        <tr><td>    6       </td><td>   ??<sub>??</sub>  </td>
-        <tr><td>    7       </td><td>   ??<sub>??</sub>  </td>
-        <tr><td>    8       </td><td>   ??<sub>??</sub>  </td>
-        <tr><td>    9       </td><td>   ??<sub>??</sub>  </td>
+        <tr><td>    Value   </td><td>   Key     </td> </tr>
+        <tr><td>    0 (Z)   </td><td>   g<sup>1</sup> </td>
+        <tr><td>    1 (I)   </td><td>   c<sup>1</sup> </td>
+        <tr><td>    2 (II)  </td><td>   c<sup>2</sup> </td>
+        <tr><td>    3 (III) </td><td>   g<sup>2</sup> </td>
+        <tr><td>    4 (IIII)</td><td>   c<sup>3</sup> </td>
+    </table>
+    <table border="1" style="background-color: #eee;float: left;">
+        <tr><td>    Value   </td><td>   Key     </td> </tr>
+        <tr><td>    5 (V)    </td><td>   e<sup>1</sup> </td>
+        <tr><td>    6 (VI)   </td><td>   e<sup>1</sup> + c<sup>1</sup> </td>
+        <tr><td>    7 (VII)  </td><td>   e<sup>1</sup> + c<sup>2</sub> </td>
+        <tr><td>    8 (VIII) </td><td>   e<sup>1</sup> + g<sup>2</sup> </td>
+        <tr><td>    9 (VIIII)</td><td>   e<sup>1</sup> + c<sup>3</sup> </td>
     </table>
 
-    <table border="1" style="background-color: #eee;float: right;">
+    <table border="1" style="background-color: #eee;float: left;">
         <tr><td>    Value   </td><td>   Key     </td></tr>
-        <tr><td>    Return      </td><td>   A<sub>4</sub> </td>
-        <tr><td>    Backspace   </td><td>   D<sub>4</sub> </td>
-        <tr><td>    Add         </td><td>   D<sub>5</sub> </td>
-        <tr><td>    Eq          </td><td>   A<sub>5</sub> </td>
+        <tr><td>    Return      </td><td>   a<sup>1</sup> </td>
+        <tr><td>    Backspace   </td><td>   d<sup>1</sup> </td>
+        <tr><td>    Add         </td><td>   d<sup>2</sup> </td>
+        <tr><td>    Eq          </td><td>   a<sup>2</sup> </td>
 
     </table>
 </div>
@@ -848,18 +897,6 @@ divert(-1)
 #define I7   (IIII+III) => ??
 #define I8   (IIII+IIII) => ??
 -->
-
-
-<DIV class="slide hammer">
-<H1>Heterodyning</H1>
-<div class="hbox" style="width:75%; height:80%">
-    <img src="../music/babby.png" style="width:100%; height:100%" />
-</div>
-</DIV>
-
-<DIV class="slide hammer">
-<H1>Let's try it!</H1>
-</DIV>
 
 
 <!--
