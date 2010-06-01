@@ -314,7 +314,36 @@ repeatedly call next-fib
 <DIV class="slide hammer">
 <H1>Taking it a step farther</H1>
 <div class="hbox">
-    M4 stuff goes here. There may just be a lot of example files or something.
+<h2>Dispite my whining, ed was overkill.</h2>
+
+<p>We could have done anything we wanted with just string replacement & recursion.
+
+<p>For example, consider the rules:
+
+<ul>
+<li> s/#0/0##/
+<li> s/1/0#/
+<li> s/0//
+</ul>
+
+<p>If we start with the string 1100 (=0C hex, or 12 decimal) and do leftmost matches first we have:
+
+<p>
+    1100 &rarr; 0#100 &rarr; #100 &rarr; #0#00 &rarr; 0###00 &rarr; ###00 <br/>
+    &rarr; ##0##0 &rarr; #0####0 &rarr; 0######0 &rarr; ######0 &rarr; <br/>
+     ...and ultimately... &rarr; ############
+<p>
+From this sort of thing we could build up to integer math and...well, anything.
+
+</div>
+</DIV>
+
+
+<DIV class="slide hammer">
+<H1>Taking it a step farther</H1>
+<div class="hbox">
+
+
 </div>
 </DIV>
 <!--
