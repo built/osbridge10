@@ -116,7 +116,11 @@ In hindsight, it all seems so obvious.  After the Oracle / Goldman Sacks merger,
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -->
 <DIV class="slide hammer" style="background-color: black">
-<img src="./lib/img/cc/54408373_af2dfafa99_b_memestate.jpg" width="600">
+<center>
+<div>
+<img src="./lib/img/cc/54408373_af2dfafa99_b_memestate.jpg" width="950">
+</div>
+</center>
 </DIV>
 <!--
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -624,7 +628,7 @@ divert(-1)
 
 
 <DIV class="slide hammer">
-<H1>Heterodyning</H1>
+<H1>Jello Muffling</H1>
 <center>
 <div>
     <img src="../music/jello_in.png"/> passed through jello <img src="../music/stretched_jello_out.png"/>
@@ -708,33 +712,57 @@ divert(-1)
 </DIV>
 
 <DIV class="slide hammer">
-<H1>Heterodyning</H1>
-<div class="hbox">
-    Assigned values:<br/>
-    <table border="1">
+<H1>Keyboard Value Mapping</H1>
+<center>
+<div>
+<img src="./lib/img/pd/scales_and_keyboard.png"><br>
+<div style="width: 50%; margin: 5px">
+    <table border="1" style="background-color: #eee;float: left;">
         <tr><td>    Value   </td><td>   Key     </td></tr>
-        <tr><td>    1       </td><td>   C<sub>0</sub> </td>
-        <tr><td>    2       </td><td>   C<sub>2</sub> </td>
-        <tr><td>    3       </td><td>   C<sub>3</sub> </td>
-        <tr><td>    4       </td><td>   G<sub>3</sub> </td>
-        <tr><td>    5       </td><td>   C<sub>4</sub> </td>
-        <tr><td>    6       </td><td>   E<sub>4</sub> </td>
-        <tr><td>    7       </td><td>   G<sub>4</sub> </td>
-        <tr><td>    8       </td><td>   A<sub>4</sub> </td>
-        <tr><td>    9       </td><td>   B<sub>4</sub>&#9837; </td>
         <tr><td>    0       </td><td>   G<sub>1</sub> </td>
+        <tr><td>    1       </td><td>   C<sub>4</sub> </td>
+        <tr><td>    2       </td><td>   C<sub>5</sub> </td>
+        <tr><td>    3       </td><td>   G<sub>5</sub> </td>
+        <tr><td>    4       </td><td>   ??<sub>??</sub> </td>
+        <tr><td>    5       </td><td>   C<sub>5</sub> + G<sub>5</sub> </td>
+        <tr><td>    6       </td><td>   ??<sub>??</sub>  </td>
+        <tr><td>    7       </td><td>   ??<sub>??</sub>  </td>
+        <tr><td>    8       </td><td>   ??<sub>??</sub>  </td>
+        <tr><td>    9       </td><td>   ??<sub>??</sub>  </td>
     </table>
+
+    <table border="1" style="background-color: #eee;float: right;">
+        <tr><td>    Value   </td><td>   Key     </td></tr>
+        <tr><td>    Return      </td><td>   A<sub>4</sub> </td>
+        <tr><td>    Backspace   </td><td>   D<sub>4</sub> </td>
+        <tr><td>    Add         </td><td>   D<sub>5</sub> </td>
+        <tr><td>    Eq          </td><td>   A<sub>5</sub> </td>
+
+    </table>
+</div>
     
 </div>
+</center>
 </DIV>
+<!--
+#define RET  A_1        => A4 x
+#define BS   D_1        => D4 x
+#define ADD  D_2        => D5 x
+#define EQ   A_2        => A5 x (pop)
+#define ZERO G_1        => G4 x
+#define I    C_1        => C4 x
+#define II   C_2        => C5 x
+#define III  G_2        => G5 x
+#define IIII (C_2*2)    => C_5 * 2 => C4? What is this?
+#define V    E_1        => E4 x
+#define XV   B_2        => B5 nothing
+#define E    (C_1/4)
+#define I5   (II+III)   => C5+ G5 = 5
+#define I6   (III+III)  ??
+#define I7   (IIII+III) => ??
+#define I8   (IIII+IIII) => ??
+-->
 
-
-<DIV class="slide hammer">
-<H1>Roman Numerals Gone Wild</H1>
-<div class="hbox">
-
-</div>
-</DIV>
 
 <DIV class="slide hammer">
 <H1>Heterodyning</H1>
@@ -744,10 +772,7 @@ divert(-1)
 </DIV>
 
 <DIV class="slide hammer">
-<H1>Heterodyning</H1>
-<div class="hbox">
-    Control keys, etc. mapped on the keyboard.
-</div>
+<H1>Let's try it!</H1>
 </DIV>
 
 
