@@ -604,3 +604,5 @@ div.slide.cover a:hover, div.slide.cover a:active {
 div.comment { display: none; visibility: hidden }
 
 @media print { div.comment { display: block; visibility: visible } }
+
+.simple-code { font-size: 120%; }
