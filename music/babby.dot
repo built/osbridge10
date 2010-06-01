@@ -11,8 +11,14 @@ digraph HeterodyneAdder {
     {node [shape=diamond,style=filled,fontcolor=white,fillcolor=blue,label="+",height=.3,width=.3];
         add01; add02; add03; add04; add05; add06;}
     {node [shape=diamond,style=filled,fontcolor=white,fillcolor=red,label="-",height=.3,width=.3];
-        sub01; sub02; sub03; sub04;}
-    {node [shape=circle fixedsize=true width=0.9 label="e"];e1;e2;e3;e4;}
+        sub01; sub03; sub04;}
+    {node [shape=circle   fixedsize=true width=0.5 fontsize=15 fontcolor=darkgreen label=0]; e1;e2;e3;e4;}
+    {node [shape=circle   fixedsize=true width=0.6 fontsize=9 fontcolor=darkgreen]; VIIII}
+    {node [shape=triangle fixedsize=true width=0.4 style=filled fontcolor=white fillcolor=green label="" ];
+        split_a;split_b;split_I;split_V;}
+
+    a -> split_a;
+    b -> split_b;
     /*
     ** Build the I-adder
     */
@@ -23,7 +29,7 @@ digraph HeterodyneAdder {
         }
         {rank=same; e1 -> add01;}
         ai -> add01 -> add03;
-                 bi -> add03 -> add05 -> sub01;
+                 bi -> add03 -> add05 -> sub01 -> split_I;
                           ci -> add05;
         {rank=same; e3 -> sub01;}
     }
@@ -31,8 +37,8 @@ digraph HeterodyneAdder {
     ** Feed the input into it
     */
 
-    a->ai;
-    b->bi;
+    split_a->ai;
+    split_b->bi;
     c->ci;
 
     /*
@@ -44,33 +50,30 @@ digraph HeterodyneAdder {
             node [shape=circle fixedsize=true width=0.9]; av;bv;
         }
         {rank=same; e2 -> add02;}
-        av -> add02 -> add04 -> add06 -> sub03;
-                 bv -> add04;
+        av -> add02 -> add04 -> add06 -> sub03 -> split_V -> sub04;
+                 bv -> add04;                       VIIII -> sub04;
         {rank=same; e4 -> sub03;}
-        sub02->add06;
     }
     /*
     ** Feed the inputs into it
     */
-    a->av;
-    b->bv;
-    /* Where does IIII come from? */
-    IIII->sub02;
+    split_a->av;
+    split_b->bv;
 
     /*
     ** Group the output
     */
     subgraph cluster_results {
         rank=same;
-        Ri; Rv; Rc;
+        Ri; Rv; C;
     }
     /*
     ** Extract the results into the output
     */
-    sub01->Ri;
-    sub01->Rc;
-    sub03->Rv;
-    Rc->sub02;
+    split_I -> Ri;
+    split_I -> add06 [constraint=false];
+    split_V -> Rv;
+    sub04 -> C;
 
     overlap=false
     label="Harmonic Math"
