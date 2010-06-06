@@ -10,3 +10,28 @@
    |^^^^^|\ |^^^^^|\
    |~~~~~|  |~~~~~| \
     \_____\/ \_____\/
+
+Notes from
+"WHEN EVERYTHING LOOKS LIKE A NAIL"
+The Matt & Markus show @ Open Source Bridge 2010
+
+If you want to see how the sausage is made, you're in the right spot. 
+We've left the history intact for the curious. The folders are as follows:
+
+ed - Fibonacci demo with ed, the bestest editor ever.
+m4 - The terrifyingly strange configuration system from an alternate reality. (?)
+meta - Some gibberish to do with the talk, including a gag we didn't use and an early outline.
+music - Code for the math-with-harmonics demo.
+one_armed_man - Constraint programming code where a one-armed man makes breakfast.
+presentation - Our Slidy-based preso. Our first time using Slidy. It wasn't bad.
+sqlgraphics - Code for rendering a pretty picture of JELLO in SQL.
+sqlweb - An ill-fated attempt to continue the SQL use/abuse. You'll get the idea from the code.
+
+We had a lot of fun presenting. We hope you had fun watching. For those of 
+you who expressed interest, we hope you'll have more fun tweaking what we've 
+made here. We'd love to have your contributions to make these demos work even 
+better, or do even more unexpected things.
+
+Enjoy!
+
+Markus + Matt
